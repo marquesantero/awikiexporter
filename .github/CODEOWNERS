@@ -1,0 +1,3 @@
+# Default owner for everything in the repo. Used for review routing and as the
+# security/CoC contact referenced by SECURITY.md and CODE_OF_CONDUCT.md.
+*       @marquesantero

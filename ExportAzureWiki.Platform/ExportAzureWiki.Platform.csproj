@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>false</UseWPF>
+    <!--
+      Fase 3.1 removed Platform's direct MessageBox usage (IUserNotifier).
+      Fase 3.1b removed the dead WinForms WebView2 export path
+      (SafeExportWrapper / WebViewManager), so Platform no longer needs the
+      WinForms stack at all. The WPF shell owns the WebView2 (WPF) surface.
+    -->
+    <UseWindowsForms>false</UseWindowsForms>
+    <!-- NU1701: legacy TFS / Azure DevOps client packages target older frameworks. -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportAzureWiki.Core\ExportAzureWiki.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExportAzureWiki.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <PackageReference Include="DocX" />
+    <PackageReference Include="ExCSS" />
+    <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="HtmlToOpenXml.dll" />
+    <PackageReference Include="LibGit2Sharp" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" />
+    <PackageReference Include="itext7.pdfhtml" />
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="Svg" />
+    <PackageReference Include="SixLabors.ImageSharp" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Identity.Client" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.Client" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="Microsoft.Playwright" />
+    <PackageReference Include="MySqlConnector" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Serilog.Sinks.Trace" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+
+  <!--
+    Direct references that exist only to override CVE-vulnerable transitive
+    versions dragged in by legacy TFS/iText/OpenXml/DocX packages. Versions
+    are pinned in Directory.Packages.props. Remove an entry once the direct
+    dependency that originally pulled it has bumped its own transitive floor
+    past the vulnerable version.
+  -->
+  <ItemGroup>
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="System.Data.SqlClient" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.IO.Packaging" />
+    <PackageReference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <!--
+    Database schema scripts. SchemaManager loads them as assembly manifest
+    resources (GetManifestResourceStream) with these exact names, so embed them
+    with an explicit LogicalName that does not depend on the on-disk "Source"
+    folder. Embedding (vs copy-to-output) also makes them work inside the MSIX.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="Source\Data\Schema\Scripts\SqlServer\001_InitialSchema.sql" LogicalName="ExportAzureWiki.Data.Schema.Scripts.SqlServer.001_InitialSchema.sql" />
+    <EmbeddedResource Include="Source\Data\Schema\Scripts\PostgreSQL\001_InitialSchema.sql" LogicalName="ExportAzureWiki.Data.Schema.Scripts.PostgreSQL.001_InitialSchema.sql" />
+    <EmbeddedResource Include="Source\Data\Schema\Scripts\MySQL\001_InitialSchema.sql" LogicalName="ExportAzureWiki.Data.Schema.Scripts.MySQL.001_InitialSchema.sql" />
+    <EmbeddedResource Include="Source\Data\Schema\Scripts\SQLite\001_InitialSchema.sql" LogicalName="ExportAzureWiki.Data.Schema.Scripts.SQLite.001_InitialSchema.sql" />
+  </ItemGroup>
+
+</Project>

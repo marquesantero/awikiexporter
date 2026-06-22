@@ -1,0 +1,262 @@
+<Window x:Class="ExportAzureWiki.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:ExportAzureWiki.Wpf.ViewModels"
+        xmlns:views="clr-namespace:ExportAzureWiki.Wpf.Views"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}" Height="900" Width="1400" MinHeight="720" MinWidth="1180"
+        Icon="/Assets/app.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource SurfaceBrush}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <LinearGradientBrush x:Key="NavBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FAFBFD" Offset="0" />
+            <GradientStop Color="#F5F7FA" Offset="0.55" />
+            <GradientStop Color="#EFF2F6" Offset="1" />
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="NavButtonIdleBrush" Color="Transparent" />
+        <SolidColorBrush x:Key="NavButtonHoverBrush" Color="#EAF1F9" />
+        <SolidColorBrush x:Key="NavButtonPressedBrush" Color="#DCEBFA" />
+        <Style x:Key="NavMenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource NavButtonIdleBrush}" />
+            <Setter Property="Foreground" Value="#1F1F1F" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Margin" Value="8,6,8,0" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="True">
+                    <Setter Property="Background" Value="{StaticResource NavButtonPressedBrush}" />
+                    <Setter Property="BorderBrush" Value="#BBD3F0" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource NavButtonHoverBrush}" />
+                    <Setter Property="BorderBrush" Value="#D0DFF2" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource NavButtonPressedBrush}" />
+                    <Setter Property="BorderBrush" Value="#BBD3F0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate DataType="{x:Type viewModels:LoginViewModel}">
+            <views:LoginView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WorkspaceViewModel}">
+            <views:WorkspaceView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:WikiManagementViewModel}">
+            <views:WikiManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:UsersGroupsViewModel}">
+            <views:UsersGroupsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:PermissionsViewModel}">
+            <views:PermissionsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ProvidersViewModel}">
+            <views:ProvidersView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:AiCenterViewModel}">
+            <views:AiCenterView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ExportCenterViewModel}">
+            <views:ExportCenterView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="NavColumn" Width="260" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="{StaticResource NavBackgroundBrush}" BorderBrush="#D5DEE9" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel x:Name="NavHeaderPanel" Margin="14,16,14,12">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Assets/branding/awikiexport_logo_image.png"
+                               Width="36" Height="36"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               VerticalAlignment="Center"
+                               AutomationProperties.Name="{Binding AppTitle}" />
+                        <TextBlock Text="{Binding AppTitle}"
+                                   Foreground="#1F1F1F" FontSize="19" FontWeight="SemiBold"
+                                   VerticalAlignment="Center" Margin="10,0,0,0" />
+                    </StackPanel>
+                    <Border Margin="0,10,0,0"
+                            Padding="10,8"
+                            CornerRadius="10"
+                            Background="#FFFFFF"
+                            BorderBrush="#D5DEE9"
+                            BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Width="24"
+                                    Height="24"
+                                    CornerRadius="12"
+                                    Background="#E7F0FB"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                           Text="&#xE77B;"
+                                           Foreground="#0F6CBD"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentUserLabel}"
+                                           Foreground="#5D6877"
+                                           FontSize="10"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding CurrentUserDisplay}"
+                                           Foreground="#1F1F1F"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <ScrollViewer x:Name="NavMenuScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8,0,8,12">
+                        <Button Style="{StaticResource NavMenuButtonStyle}" Command="{Binding ShowWorkspaceCommand}" Tag="{Binding IsWorkspaceSelected}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80F;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavWorkspace}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ShowWikiManagementCommand}"
+                                Tag="{Binding IsWikiManagementSelected}"
+                                Visibility="{Binding IsAdminUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavWikis}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ShowUsersGroupsCommand}"
+                                Tag="{Binding IsUsersGroupsSelected}"
+                                Visibility="{Binding IsAdminUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE716;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavUsers}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ShowPermissionsCommand}"
+                                Tag="{Binding IsPermissionsSelected}"
+                                Visibility="{Binding IsAdminUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72E;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavPermissions}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ShowProvidersCommand}"
+                                Tag="{Binding IsProvidersSelected}"
+                                Visibility="{Binding IsAdminUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE713;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavProviders}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ShowConnectionTokenCommand}"
+                                Visibility="{Binding IsAdminUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8C7;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavConnectionToken}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Command="{Binding ManageDataCommand}"
+                                Visibility="{Binding IsAuthenticatedUser, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8F1;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavManageData}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavMenuButtonStyle}" Command="{Binding ShowHelpCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE897;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavHelp}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Border x:Name="NavFooterPanel" Grid.Row="2" Margin="10,0,10,10" Background="#FFFFFF" CornerRadius="10" Padding="10" BorderBrush="#D5DEE9" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{Binding LanguageLabel}"
+                                   Foreground="#5D6877"
+                                   FontSize="11"
+                                   Margin="2,0,2,4" />
+                        <ComboBox Height="28"
+                                  Margin="0,0,0,8"
+                                  ItemsSource="{Binding LanguageOptions}"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Button Style="{StaticResource NavMenuButtonStyle}"
+                                Margin="0"
+                                Padding="10,8"
+                                Command="{Binding LogoutCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8AC;" Margin="0,0,8,0" FontSize="14" />
+                                <TextBlock Text="{Binding NavLogout}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <Button x:Name="BtnToggleNav"
+                        Width="30"
+                        Height="30"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0,9,9,0"
+                        Background="#FFFFFF"
+                        Foreground="#24425E"
+                        BorderBrush="#C9D4E2"
+                        BorderThickness="1"
+                        Content="◀"
+                        Click="BtnToggleNav_OnClick" />
+            </Grid>
+        </Border>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" />
+    </Grid>
+</Window>

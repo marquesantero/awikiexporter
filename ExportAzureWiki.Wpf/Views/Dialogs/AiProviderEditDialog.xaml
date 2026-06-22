@@ -1,0 +1,113 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.AiProviderEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ExportAzureWiki.Wpf.Controls"
+        Title="{Binding DialogTitle}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        MinWidth="620"
+        MinHeight="560"
+        Width="740"
+        Height="700"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}" Padding="14">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="190"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding DialogTitle}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+
+            <TextBlock Grid.Row="1" Text="{Binding DisplayNameText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0,0,8" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="2" Text="{Binding ProviderNameText}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="2"
+                      Grid.Column="1"
+                      Margin="8,0,0,8"
+                      ItemsSource="{Binding ProviderPresets}"
+                      DisplayMemberPath="DisplayName"
+                      SelectedItem="{Binding SelectedPreset}" />
+
+            <TextBlock Grid.Row="3" Text="{Binding EndpointText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="8,0,0,8" Text="{Binding EndpointUrl, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="4" Text="{Binding ApiKeyText}" VerticalAlignment="Center" />
+            <controls:SensitiveTextBox Grid.Row="4"
+                                       Grid.Column="1"
+                                       Margin="8,0,0,8"
+                                       Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="5" Text="{Binding ModelText}" VerticalAlignment="Top" Margin="0,6,0,0" />
+            <StackPanel Grid.Row="5" Grid.Column="1" Margin="8,0,0,8">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" MinWidth="120" Margin="6,0,0,0"
+                            Content="{Binding TestText}" Command="{Binding TestCommand}"
+                            Style="{StaticResource SecondaryActionButtonStyle}" />
+                    <Button DockPanel.Dock="Right" MinWidth="120" Margin="6,0,0,0"
+                            Content="{Binding LoadModelsText}" Command="{Binding LoadModelsCommand}"
+                            Style="{StaticResource SecondaryActionButtonStyle}" />
+                    <ComboBox IsEditable="True"
+                              ItemsSource="{Binding AvailableModels}"
+                              Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <TextBlock Text="{Binding ProbeStatus}" Foreground="#54636C" TextWrapping="Wrap" Margin="0,4,0,0" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="6" Text="{Binding ApiVersionText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="6" Grid.Column="1" Margin="8,0,0,8" Text="{Binding ApiVersion, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="7" Text="{Binding OrganizationText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="7" Grid.Column="1" Margin="8,0,0,8" Text="{Binding OrganizationId, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="8" Text="{Binding TemperatureText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="8" Grid.Column="1" Margin="8,0,0,8" Text="{Binding TemperatureValue, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="9" Text="{Binding MaxTokensText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="9" Grid.Column="1" Margin="8,0,0,8" Text="{Binding MaxTokensValue, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="10" Text="{Binding TopPText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="10" Grid.Column="1" Margin="8,0,0,8" Text="{Binding TopPValue, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="11" Text="{Binding TimeoutSecondsText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="11" Grid.Column="1" Margin="8,0,0,8" Text="{Binding TimeoutSecondsValue, UpdateSourceTrigger=PropertyChanged}" />
+
+            <StackPanel Grid.Row="12" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <CheckBox Margin="0,0,16,0" Content="{Binding EnabledText}" IsChecked="{Binding IsEnabled}" />
+                <CheckBox Content="{Binding DefaultText}" IsChecked="{Binding IsDefault}" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="13" Grid.ColumnSpan="2" Foreground="#54636C" TextWrapping="Wrap"
+                       Text="{Binding HelpText}" />
+        </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="{Binding CancelText}" Width="120" Margin="0,0,8,0" Click="BtnCancel_OnClick" Style="{StaticResource SecondaryActionButtonStyle}"/>
+            <Button Content="{Binding SaveText}" Width="140" Click="BtnSave_OnClick" Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

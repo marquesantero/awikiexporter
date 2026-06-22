@@ -1,0 +1,117 @@
+{
+  "providers": [
+    {
+      "providerName": "AzureAD",
+      "displayName": "Azure Active Directory",
+      "registrationUrl": "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+      "helpText": "1. Acesse o Azure Portal\n2. Navegue até 'Registros de aplicativo'\n3. Clique em 'Novo registro'\n4. Configure o URI de redirecionamento: http://localhost:5000/callback\n5. Copie o ID do Aplicativo (cliente) e o ID do Diretório (locatário)",
+      "defaultScopes": "openid profile email",
+      "requiredFields": [
+        {
+          "fieldName": "ClientId",
+          "displayLabel": "ID do Aplicativo (cliente)",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "ex: 12345678-1234-1234-1234-123456789012"
+        },
+        {
+          "fieldName": "TenantId",
+          "displayLabel": "ID do Diretório (locatário)",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "ex: 87654321-4321-4321-4321-210987654321"
+        },
+        {
+          "fieldName": "RedirectUri",
+          "displayLabel": "URI de Redirecionamento",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "http://localhost:5000/callback"
+        }
+      ]
+    },
+    {
+      "providerName": "GitHub",
+      "displayName": "GitHub",
+      "registrationUrl": "https://github.com/settings/developers",
+      "helpText": "1. Acesse GitHub Settings > Developer settings > OAuth Apps\n2. Clique em 'New OAuth App'\n3. Configure a URL de callback: http://localhost:5000/callback\n4. Copie o Client ID e gere um Client Secret",
+      "defaultScopes": "read:user user:email",
+      "requiredFields": [
+        {
+          "fieldName": "ClientId",
+          "displayLabel": "Client ID",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": ""
+        },
+        {
+          "fieldName": "ClientSecret",
+          "displayLabel": "Client Secret",
+          "isSecret": true,
+          "isRequired": true,
+          "placeholderText": ""
+        },
+        {
+          "fieldName": "RedirectUri",
+          "displayLabel": "URL de Callback",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "http://localhost:5000/callback"
+        }
+      ]
+    },
+    {
+      "providerName": "Google",
+      "displayName": "Google",
+      "registrationUrl": "https://console.cloud.google.com/apis/credentials",
+      "helpText": "1. Acesse Google Cloud Console\n2. Crie ou selecione um projeto\n3. Vá para APIs & Services > Credentials\n4. Crie credenciais OAuth 2.0\n5. Adicione o URI de redirecionamento: http://localhost:5000/callback",
+      "defaultScopes": "openid profile email",
+      "requiredFields": [
+        {
+          "fieldName": "ClientId",
+          "displayLabel": "Client ID",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": ""
+        },
+        {
+          "fieldName": "ClientSecret",
+          "displayLabel": "Client Secret",
+          "isSecret": true,
+          "isRequired": true,
+          "placeholderText": ""
+        },
+        {
+          "fieldName": "RedirectUri",
+          "displayLabel": "URI de Redirecionamento",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "http://localhost:5000/callback"
+        }
+      ]
+    },
+    {
+      "providerName": "Microsoft",
+      "displayName": "Conta Microsoft",
+      "registrationUrl": "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+      "helpText": "1. Acesse o Azure Portal\n2. Crie um registro de aplicativo para Contas Microsoft pessoais\n3. Configure o URI de redirecionamento: http://localhost:5000/callback\n4. Copie o Client ID",
+      "defaultScopes": "openid profile email",
+      "requiredFields": [
+        {
+          "fieldName": "ClientId",
+          "displayLabel": "Client ID",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": ""
+        },
+        {
+          "fieldName": "RedirectUri",
+          "displayLabel": "URI de Redirecionamento",
+          "isSecret": false,
+          "isRequired": true,
+          "placeholderText": "http://localhost:5000/callback"
+        }
+      ]
+    }
+  ]
+}

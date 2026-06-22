@@ -1,0 +1,90 @@
+<UserControl x:Class="ExportAzureWiki.Wpf.Views.WikiManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="{StaticResource SurfaceBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Margin="20" Padding="14" Style="{StaticResource CardBorderStyle}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="{Binding HeaderTitle}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDarkBrush}" />
+                    <TextBlock Text="{Binding Status}" Margin="0,6,0,0" Foreground="#334" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Content="{Binding RefreshText}" Command="{Binding RefreshCommand}" Width="110" Height="34"
+                        Style="{StaticResource PrimaryActionButtonStyle}" />
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="1" Margin="20,0,20,20" Padding="10" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="340"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Padding="10,7" Background="#F4F7FB" BorderBrush="#DCE5F0" BorderThickness="1" CornerRadius="7">
+                        <TextBlock Text="{Binding HeaderTitle}" FontWeight="SemiBold" Foreground="#546476"/>
+                    </Border>
+                    <DataGrid Grid.Row="1" Margin="0,8,0,0" ItemsSource="{Binding Wikis}" SelectedItem="{Binding SelectedWiki}" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn x:Name="colWikiName" Header="{Binding DataContext.NameText, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding Name}" Width="220"/>
+                            <DataGridTextColumn x:Name="colWikiPlatform" Header="{Binding DataContext.PlatformText, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding Platform}" Width="120"/>
+                            <DataGridTextColumn x:Name="colWikiOrganization" Header="{Binding DataContext.OrganizationHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding OrganizationUrl}" Width="220"/>
+                            <DataGridTextColumn x:Name="colWikiProject" Header="{Binding DataContext.ProjectHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding ProjectName}" Width="180"/>
+                            <DataGridTextColumn x:Name="colWikiWiki" Header="{Binding DataContext.WikiHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding WikiName}" Width="180"/>
+                            <DataGridTextColumn x:Name="colWikiRepository" Header="{Binding DataContext.RepositoryHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding RepositoryId}" Width="180"/>
+                            <DataGridTextColumn x:Name="colWikiStartPoints" Header="{Binding DataContext.StartPointsHeader, RelativeSource={RelativeSource AncestorType=DataGrid}}" Binding="{Binding RootPath}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <Border Grid.Column="2" Padding="10" Style="{StaticResource PanelBorderStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding HeaderTitle}" FontWeight="SemiBold" />
+
+                        <StackPanel Grid.Row="1" Margin="0,10,0,8">
+                            <TextBlock Text="{Binding SelectedWiki.Name, TargetNullValue='-'}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDarkBrush}" />
+                            <TextBlock Margin="0,6,0,0" Text="{Binding PlatformText}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.Platform, TargetNullValue='-'}" />
+
+                            <TextBlock Margin="0,8,0,0" Text="{Binding OrganizationUrlText}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.OrganizationUrl, TargetNullValue='-'}" TextWrapping="Wrap" />
+
+                            <TextBlock Margin="0,8,0,0" Text="{Binding ProjectHeader}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.ProjectName, TargetNullValue='-'}" />
+
+                            <TextBlock Margin="0,8,0,0" Text="{Binding WikiHeader}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.WikiName, TargetNullValue='-'}" />
+
+                            <TextBlock Margin="0,8,0,0" Text="{Binding RepositoryHeader}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.RepositoryId, TargetNullValue='-'}" />
+
+                            <TextBlock Margin="0,8,0,0" Text="{Binding StartPointsHeader}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SelectedWiki.RootPath, TargetNullValue='-'}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Left">
+                            <Button Width="105" Margin="0,0,8,0" Content="{Binding NewText}" Click="BtnNew_OnClick" Style="{StaticResource SecondaryActionButtonStyle}" />
+                            <Button Width="105" Margin="0,0,8,0" Content="{Binding EditText}" Click="BtnEdit_OnClick" IsEnabled="{Binding CanEditSelected}" Style="{StaticResource SecondaryActionButtonStyle}" />
+                            <Button Width="105" Content="{Binding DeleteText}" Command="{Binding DeleteCommand}" Style="{StaticResource SecondaryActionButtonStyle}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

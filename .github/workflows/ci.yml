@@ -1,0 +1,235 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  forbidden-paths:
+    name: Forbid build artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Fail if tracked build artifacts / logs are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Patterns we never want tracked. Keep aligned with .gitignore.
+          patterns=(
+            'bin/'
+            'obj/'
+            '^artifacts/'
+            '\.vs/'
+            '\.log$'
+            '^nul$'
+            '\.user$'
+            '\.suo$'
+            'AppPackages/'
+            '\.msix$'
+            '\.msixbundle$'
+            '\.appx$'
+            'EBWebView/'
+            '\.pfx$'
+            '\.cer$'
+          )
+          regex=$(IFS='|'; echo "${patterns[*]}")
+          violations=$(git ls-files | grep -E "$regex" || true)
+          if [ -n "$violations" ]; then
+            echo "::error::The following tracked files violate repository hygiene rules:"
+            printf '%s\n' "$violations"
+            exit 1
+          fi
+          echo "OK - no forbidden paths tracked."
+
+  build:
+    name: Build solution
+    runs-on: windows-2025
+    needs: forbidden-paths
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore .\ExportAzureWiki.sln
+
+      - name: Build
+        run: dotnet build .\ExportAzureWiki.sln -c Release --no-restore
+
+  test:
+    name: Run unit tests
+    runs-on: windows-2025
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore .\ExportAzureWiki.sln
+
+      - name: Build (Release)
+        run: dotnet build .\ExportAzureWiki.sln -c Release --no-restore
+
+      - name: Run tests
+        # Exclude the Testcontainers integration tests: the hosted Windows runner
+        # cannot pull the Linux database images they require (Docker runs in
+        # Windows-container mode). DockerAvailable() returns true there, so the
+        # filter -- not the in-test guard -- is what keeps them out.
+        run: >
+          dotnet test .\ExportAzureWiki.sln
+          -c Release
+          --no-build
+          --filter "Category!=Integration"
+          --logger "trx;LogFileName=test-results.trx"
+          --logger "console;verbosity=minimal"
+          --collect:"XPlat Code Coverage"
+          --results-directory artifacts\test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: artifacts/test-results/**/*
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Enforce coverage gate
+        shell: pwsh
+        # Regression guard: fail if line coverage of the tested product
+        # assemblies (Platform + Core) drops below the floor. The WPF UI is
+        # deliberately excluded -- it is exercised manually, not by unit tests,
+        # so folding its ~1% into the global rate would mask the real library
+        # coverage (and is why the cobertura global line-rate reads far lower).
+        # Raise the floor as coverage grows; do not lower it without discussion.
+        env:
+          MIN_LINE_RATE: '0.27'
+        run: |
+          $min = [double]$env:MIN_LINE_RATE
+          $report = Get-ChildItem artifacts\test-results -Recurse -Filter coverage.cobertura.xml |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $report) { Write-Host "::error::No coverage report (coverage.cobertura.xml) found."; exit 1 }
+          [xml]$c = Get-Content $report.FullName
+          $include = @('ExportAzureWiki.Platform', 'ExportAzureWiki.Core')
+          $covered = 0; $valid = 0
+          foreach ($p in $c.coverage.packages.package) {
+            if ($include -notcontains $p.name) { continue }
+            foreach ($cl in $p.classes.class) {
+              foreach ($ln in $cl.lines.line) { $valid++; if ([int]$ln.hits -gt 0) { $covered++ } }
+            }
+          }
+          if ($valid -eq 0) { Write-Host "::error::No covered lines found for Platform/Core in the coverage report."; exit 1 }
+          $rate = $covered / $valid
+          Write-Host ("Platform+Core line coverage: {0:P2} ({1}/{2} lines, gate {3:P0})" -f $rate, $covered, $valid, $min)
+          if ($rate -lt $min) {
+            Write-Host ("::error::Platform+Core line coverage {0:P2} is below the {1:P0} gate." -f $rate, $min)
+            exit 1
+          }
+
+  vulnerable-packages:
+    name: Scan vulnerable NuGet packages
+    runs-on: windows-2025
+    needs: forbidden-paths
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore .\ExportAzureWiki.sln
+
+      - name: List vulnerable packages
+        shell: pwsh
+        run: |
+          $report = dotnet list .\ExportAzureWiki.sln package --vulnerable --include-transitive 2>&1 | Out-String
+          Write-Host $report
+          # Advisories with no fix available yet -- tolerated until upstream
+          # ships a patched version. Keep this list tight: every entry needs a
+          # reason and a revisit. Any OTHER High/Critical still fails the gate.
+          #   GHSA-2m69-gcr7-jv3q  SQLitePCLRaw.lib.e_sqlite3 (transitive via
+          #     Microsoft.Data.Sqlite): bundles a vulnerable SQLite; the advisory
+          #     reports firstPatchedVersion=null, so no version bump can fix it.
+          $allow = @('GHSA-2m69-gcr7-jv3q')
+          $bad = $report -split "`r?`n" | Where-Object {
+            if ($_ -notmatch '(?i)\b(High|Critical)\b') { return $false }
+            foreach ($a in $allow) { if ($_ -match [regex]::Escape($a)) { return $false } }
+            return $true
+          }
+          if ($bad) {
+            Write-Host "::error::High or Critical vulnerabilities (not on the allowlist) found in NuGet packages."
+            $bad | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          if ($report -match 'has the following vulnerable packages') {
+            Write-Host "::warning::Vulnerabilities reported (allowlisted or Low/Moderate); review above."
+          }
+
+  sbom:
+    name: Generate CycloneDX SBOM
+    # Runs on Windows because the Wpf and Platform projects target
+    # net8.0-windows; the Linux runner refuses to restore them
+    # without EnableWindowsTargeting=true.
+    runs-on: windows-2025
+    needs: forbidden-paths
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Install CycloneDX tool
+        run: dotnet tool install --global CycloneDX --version 5.2.0
+
+      - name: Restore solution
+        run: dotnet restore .\ExportAzureWiki.sln
+
+      - name: Generate SBOM (CycloneDX JSON)
+        shell: pwsh
+        # --json    machine-readable output
+        # --output  artifacts/sbom/ -- gathered by the upload step below
+        # The CLI writes ExportAzureWiki.bom.json directly under --output.
+        run: |
+          New-Item -ItemType Directory -Path artifacts\sbom -Force | Out-Null
+          dotnet CycloneDX .\ExportAzureWiki.sln `
+            --json `
+            --output artifacts\sbom `
+            --filename ExportAzureWiki.bom.json `
+            --set-version "${{ github.sha }}" `
+            --set-name "ExportAzureWiki"
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: sbom-cyclonedx
+          path: artifacts/sbom/ExportAzureWiki.bom.json
+          if-no-files-found: error
+          retention-days: 90

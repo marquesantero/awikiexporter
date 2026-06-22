@@ -1,0 +1,63 @@
+# Default: auto-normalize line endings on commit, check out native on each OS.
+* text=auto eol=lf
+
+# MSBuild project files use LF. Dependabot edits these via GitHub's web
+# merge, which writes LF; forcing CRLF here made every dependency bump show
+# up as a whole-file diff. VS / MSBuild / .NET all handle LF fine.
+*.csproj        text eol=lf
+*.vbproj        text eol=lf
+*.vcxproj       text eol=lf
+*.vcxproj.*     text eol=lf
+*.props         text eol=lf
+*.targets       text eol=lf
+
+# Force CRLF for the remaining Windows-only / Visual Studio files
+*.sln           text eol=crlf
+*.xaml          text eol=crlf
+*.config        text eol=crlf
+*.ps1           text eol=crlf
+*.psm1          text eol=crlf
+*.psd1          text eol=crlf
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.reg           text eol=crlf
+*.vdproj        text eol=crlf
+
+# LF on Unix-friendly files
+*.sh            text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.json          text eol=lf
+
+# Binary files — never normalize
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.svg           text eol=lf
+*.pdf           binary
+*.docx          binary
+*.xlsx          binary
+*.pptx          binary
+*.zip           binary
+*.7z            binary
+*.gz            binary
+*.tar           binary
+*.dll           binary
+*.exe           binary
+*.pdb           binary
+*.snk           binary
+*.pfx           binary
+*.cer           binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.otf           binary
+*.eot           binary
+*.msi           binary
+*.cab           binary
+
+# Linguist hints for GitHub language stats
+*.xaml          linguist-language=XAML
+docs/**         linguist-documentation

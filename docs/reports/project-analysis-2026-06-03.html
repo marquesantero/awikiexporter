@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ExportAzureWiki Project Analysis - 2026-06-03</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --blue: #1f6feb;
+      --green: #1b7f4c;
+      --amber: #a15c00;
+      --red: #b42318;
+      --purple: #6f42c1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 48px 6vw 34px;
+    }
+    header h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 56px);
+      letter-spacing: 0;
+    }
+    header p { margin: 0; color: #d1d5db; max-width: 980px; }
+    main { padding: 28px 6vw 56px; }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin: 0 0 18px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+    h2 { margin: 0 0 14px; font-size: 24px; }
+    h3 { margin: 20px 0 8px; font-size: 18px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+    .metric strong { display: block; font-size: 28px; }
+    .metric span { color: var(--muted); }
+    .status {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .ok { color: var(--green); background: #eaf7ef; }
+    .warn { color: var(--amber); background: #fff4df; }
+    .risk { color: var(--red); background: #fff0ee; }
+    .info { color: var(--blue); background: #edf4ff; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 8px;
+    }
+    th { color: #374151; background: #f9fafb; }
+    code {
+      background: #eef2f7;
+      border-radius: 5px;
+      padding: 2px 5px;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    ul { padding-left: 22px; }
+    .callout {
+      border-left: 4px solid var(--blue);
+      padding: 12px 14px;
+      background: #f2f7ff;
+      border-radius: 6px;
+    }
+    .timeline li { margin-bottom: 8px; }
+    footer { color: var(--muted); padding: 0 6vw 36px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ExportAzureWiki Project Analysis</h1>
+    <p>Generated on 2026-06-03 for repository <strong>marquesantero/awikiexporter</strong>. This report summarizes project health, architecture, GitHub currency, release readiness, and cleanup actions for the modern WPF/Core/Platform codebase.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Executive Summary</h2>
+      <p><span class="status ok">Build ready</span> <span class="status warn">History reset planned</span> <span class="status info">First release candidate</span></p>
+      <p>The GitHub repository was materially behind the workspace. Remote <code>main</code> still reflected the prior repository history and documentation state, while the workspace contained the supported WPF migration, active Core contracts, Platform services, WPF assets, and export pipeline changes. The project now builds successfully after repairing the CLI to use the shared platform service facade.</p>
+      <div class="grid">
+        <div class="metric"><strong>4</strong><span>active solution projects</span></div>
+        <div class="metric"><strong>.NET 8</strong><span>application target framework</span></div>
+        <div class="metric"><strong>Windows</strong><span>required runtime family</span></div>
+        <div class="metric"><strong>0</strong><span>build warnings/errors after cleanup validation</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>GitHub Currency Check</h2>
+      <table>
+        <tr><th>Area</th><th>Observed State</th><th>Impact</th></tr>
+        <tr><td>Repository</td><td><code>https://github.com/marquesantero/awikiexporter</code>, public, default branch <code>main</code>.</td><td>Reachable and writable with the connected GitHub identity.</td></tr>
+        <tr><td>Remote status</td><td>Remote <code>main</code> had a newer README-only commit while the local feature branch contained the modern product work.</td><td>The remote project was obsolete relative to the current workspace implementation.</td></tr>
+        <tr><td>Release status</td><td>No existing GitHub release was present before this cleanup.</td><td>Suitable for a first clean release after history reset.</td></tr>
+        <tr><td>Open PRs</td><td>No open pull requests were found.</td><td>Force-pushing a clean root does not interrupt active repository review work.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Architecture</h2>
+      <p>The supported architecture is a layered Windows desktop system. The previous monolithic WinForms tree is removed from the clean state and replaced by a smaller solution boundary.</p>
+      <table>
+        <tr><th>Project</th><th>Purpose</th><th>Notes</th></tr>
+        <tr><td><code>ExportAzureWiki.Core</code></td><td>Shared models and service contracts.</td><td>Keeps UI and platform implementation decoupled.</td></tr>
+        <tr><td><code>ExportAzureWiki.Platform</code></td><td>Provider adapters, data access, authentication, rendering, export engines, and service registry.</td><td>Owns integration-heavy behavior.</td></tr>
+        <tr><td><code>ExportAzureWiki.Wpf</code></td><td>Modern desktop UI, view models, dialogs, help, icons, and export rendering assets.</td><td>Primary application shell.</td></tr>
+        <tr><td><code>ExportAzureWiki.CLI</code></td><td>Command-line export/config facade.</td><td>Now uses <code>PlatformHost.CreateServices()</code> instead of deleted legacy services.</td></tr>
+      </table>
+      <div class="callout">Primary design direction: keep application contracts in Core, implementation in Platform, and user workflow/state in WPF view models.</div>
+    </section>
+
+    <section>
+      <h2>Cleanup Actions</h2>
+      <ul>
+        <li>Removed the obsolete tracked WinForms-era application tree from the clean commit state.</li>
+        <li>Moved export runtime assets to <code>ExportAzureWiki.Wpf/style</code> and icons to <code>ExportAzureWiki.Wpf/Assets/icons</code>.</li>
+        <li>Removed generated installer binaries from the repository root state.</li>
+        <li>Updated ignore rules for installer build output directories.</li>
+        <li>Added CI to validate restore and Release build on Windows.</li>
+        <li>Added contribution guidance and a changelog for release traceability.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Validation</h2>
+      <table>
+        <tr><th>Command</th><th>Result</th><th>Comment</th></tr>
+        <tr><td><code>dotnet restore .\ExportAzureWiki.sln</code></td><td><span class="status ok">Passed</span></td><td>Restored Core, Platform, WPF, and CLI projects.</td></tr>
+        <tr><td><code>dotnet build .\ExportAzureWiki.sln -c Release --no-restore</code></td><td><span class="status ok">Passed</span></td><td>Completed with zero warnings and zero errors after CLI repair.</td></tr>
+        <tr><td>GitHub repository query</td><td><span class="status ok">Passed</span></td><td>Confirmed default branch, visibility, release absence, and open PR absence.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Risks And Follow-Up</h2>
+      <table>
+        <tr><th>Risk</th><th>Severity</th><th>Recommendation</th></tr>
+        <tr><td>No active automated test project remains in the clean solution.</td><td><span class="status warn">Medium</span></td><td>Add targeted tests around configuration persistence, export preprocessing, and permission filtering.</td></tr>
+        <tr><td>The app targets Windows-specific frameworks and WebView2.</td><td><span class="status info">Expected</span></td><td>Keep CI on Windows runners and document WebView2 as a runtime requirement.</td></tr>
+        <tr><td>Export rendering depends on bundled JS/CSS assets.</td><td><span class="status warn">Medium</span></td><td>Keep asset paths under WPF project coverage and validate output copy rules during release builds.</td></tr>
+        <tr><td>Secrets are provided through PAT/OAuth/API key workflows.</td><td><span class="status warn">Medium</span></td><td>Continue avoiding committed local settings and scrub remote URLs before public pushes.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Release Recommendation</h2>
+      <p>Release as <code>v1.0.0</code> from the clean root commit. The release should emphasize the supported WPF architecture, export pipeline stabilization, CLI repair, repository cleanup, and CI readiness.</p>
+      <ul class="timeline">
+        <li>Create a single orphan/root commit on <code>main</code>.</li>
+        <li>Force-push <code>main</code> to replace obsolete public history.</li>
+        <li>Tag the clean commit as <code>v1.0.0</code>.</li>
+        <li>Create the first GitHub release with validation notes.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    Report generated from local workspace analysis and GitHub repository inspection on 2026-06-03.
+  </footer>
+</body>
+</html>

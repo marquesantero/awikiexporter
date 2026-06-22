@@ -1,0 +1,48 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.AiResultDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="{Binding DialogTitle}"
+        Width="980"
+        Height="720"
+        MinWidth="820"
+        MinHeight="560"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{Binding StatusText}" Foreground="#334" Margin="0,0,0,8"/>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="{Binding MarkdownTabText}">
+                <TextBox Text="{Binding MarkdownContent, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
+                         AcceptsTab="True"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto"
+                         FontFamily="Consolas"
+                         FontSize="12"/>
+            </TabItem>
+            <TabItem Header="{Binding PreviewTabText}">
+                <wv2:WebView2 x:Name="wbPreview" Focusable="False"/>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Width="150"
+                    Margin="0,0,8,0"
+                    Content="{Binding AddAsPreviewPageText}"
+                    Click="BtnAddAsPreviewPage_OnClick"
+                    Style="{StaticResource SecondaryActionButtonStyle}"/>
+            <Button Width="120"
+                    Content="{Binding CloseText}"
+                    Click="BtnClose_OnClick"
+                    Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

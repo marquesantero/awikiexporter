@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!--
+      The app ships only Portuguese and English UI. Drop the satellite
+      resource assemblies that NuGet dependencies bring for other locales
+      (ru, ja, ko, zh-Hans, fr, de, it, ...) from publish output.
+    -->
+    <SatelliteResourceLanguages>en;pt-BR</SatelliteResourceLanguages>
+
+    <!-- Windows Explorer / taskbar icon embedded in the exe. -->
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!-- Branding assets referenced from XAML (window icons, login logo). -->
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\branding\awikiexport_logo.png" />
+    <Resource Include="Assets\branding\awikiexport_logo_image.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportAzureWiki.Platform\ExportAzureWiki.Platform.csproj" />
+    <ProjectReference Include="..\ExportAzureWiki.Core\ExportAzureWiki.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Expose internals (e.g. the pure tree builder) to the unit-test project. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExportAzureWiki.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Ship only the runtime render assets (vendor/, styles/, languages/,
+      highlight.js, theme CSS). style/node_modules is the npm build tree used
+      to regenerate the vendored mermaid/mathjax bundles (~80 MB of dev cruft
+      with no runtime use), so exclude it (and the npm manifests) from both
+      build output and the MSIX package. Nothing in the code references
+      node_modules.
+    -->
+    <None Include="style\**\*"
+          Exclude="style\node_modules\**;style\package.json;style\package-lock.json">
+      <Link>style\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\icons\word.png">
+      <Link>Assets\icons\word.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\icons\pdf.png">
+      <Link>Assets\icons\pdf.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\help\**\*.html">
+      <Link>help\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

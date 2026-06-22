@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Reference the WPF app to unit-test its view models; pulls in the WPF
+         framework reference so its types resolve. -->
+    <UseWPF>true</UseWPF>
+    <!-- Test code intentionally uses some patterns analyzers flag. -->
+    <NoWarn>$(NoWarn);CA1707;CA2007;CA1861;CA1305;xUnit1031</NoWarn>
+  </PropertyGroup>
+
+  <!-- UseWPF swaps in the WindowsDesktop implicit-usings set, which omits
+       System.IO; restore it so the existing tests keep compiling. -->
+  <ItemGroup>
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Testcontainers.MsSql" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Testcontainers.MySql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportAzureWiki.Core\ExportAzureWiki.Core.csproj" />
+    <ProjectReference Include="..\ExportAzureWiki.Platform\ExportAzureWiki.Platform.csproj" />
+    <ProjectReference Include="..\ExportAzureWiki.Wpf\ExportAzureWiki.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

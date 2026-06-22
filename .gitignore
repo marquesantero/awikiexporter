@@ -1,0 +1,111 @@
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.VC.db
+*.opendb
+
+# Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Test / coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+.nuget/
+
+# Logs / temp
+*.log
+logs/
+*.tmp
+*.temp
+*.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local environment / secrets
+.env
+.env.*
+appsettings.Development.json
+secrets.json
+
+# App local runtime data (if generated under repo)
+**/WikiImages/
+**/WikiPages/
+**/Cache/
+**/Logs/
+
+# Installer outputs
+*.msi
+*.cab
+AExportWikiSetup/Debug/
+AExportWikiSetup/Release/
+WikiExporterInstall/Debug/
+WikiExporterInstall/Release/
+
+# Workspace-specific
+.claude/
+nul
+
+# WebView2 / Playwright runtime artifacts that may appear under bin/
+**/EBWebView/
+**/.playwright/
+**/playwright-browsers/
+
+# MSIX / WiX outputs
+**/AppPackages/
+**/*.msix
+**/*.msixbundle
+**/*.appx
+**/*.appxbundle
+**/BundleArtifacts/
+
+# Code-signing material — NEVER commit. .pfx is the private key; the .cer
+# public cert and the signing artifacts dir are produced by the tooling.
+*.pfx
+*.cer
+*.snk
+artifacts/signing/
+
+# Test results (extra patterns beyond TestResults/)
+**/*.received.*
+**/*.received/
+
+# JetBrains
+.idea/
+
+# VS Code (allow shared, ignore personal)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Node.js
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+

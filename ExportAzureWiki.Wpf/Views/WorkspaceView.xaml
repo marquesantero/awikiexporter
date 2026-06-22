@@ -1,0 +1,445 @@
+<UserControl x:Class="ExportAzureWiki.Wpf.Views.WorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:controls="clr-namespace:ExportAzureWiki.Wpf.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <Style x:Key="WorkspaceSectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#546476" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource SurfaceBrush}" ClipToBounds="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Margin="16,14,16,10" Padding="14,12" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding HeaderTitle}" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDarkBrush}" />
+                    <TextBlock Margin="0,4,0,0" Text="{Binding Status}" Foreground="#5B6C7E" />
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        Width="300"
+                        Padding="10,9"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Top"
+                        Background="#E9F1FB"
+                        CornerRadius="7"
+                        BorderBrush="#C9DBF2"
+                        BorderThickness="1"
+                        Visibility="{Binding ShowBusyFeedback, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding BusyMessage}"
+                                   Foreground="#1D3E63"
+                                   FontWeight="SemiBold"
+                                   FontSize="12" />
+                        <ProgressBar Margin="0,6,0,0"
+                                     Height="8"
+                                     Foreground="#0F6CBD"
+                                     Background="#DCE5F0"
+                                     IsIndeterminate="True" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="16,0,16,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Padding="10" Style="{StaticResource CardBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Padding="10,8"
+                            CornerRadius="7"
+                            Background="#F4F7FB"
+                            BorderBrush="#DCE5F0"
+                            BorderThickness="1">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Left">
+                                <TextBlock Text="{Binding WikiDetailsText}" FontSize="17" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDarkBrush}" />
+                            </StackPanel>
+
+                            <StackPanel DockPanel.Dock="Right"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Margin="20,0,0,0">
+                                <TextBlock Text="{Binding LastUpdatedText}"
+                                           Foreground="#5B6C7E"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Margin="8,0,0,0"
+                                           Text="{Binding CurrentPageLastUpdatedDisplay}"
+                                           Foreground="#2D3F55"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="28,0,0,0">
+                                <Border Width="1" Height="18" Background="#C9D4E2" Margin="0,0,14,0"/>
+                                <TextBlock Text="{Binding CurrentSourceText}" Foreground="#5B6C7E" VerticalAlignment="Center" />
+                                <TextBlock Margin="14,0,0,0" Text="{Binding CurrentDocumentTitle}" Foreground="#0F6CBD" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="0,12,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="290" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TabControl Grid.Row="0" BorderThickness="0" Background="Transparent"
+                                        SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+                                <!-- Online: tree of saved wikis -->
+                                <TabItem Header="{Binding OnlineTabText}">
+                                    <Grid Margin="0,8,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                                            <TextBlock Text="{Binding ConfiguredWikisText}" Style="{StaticResource WorkspaceSectionTitleStyle}" />
+                                            <ComboBox Margin="0,6,0,0"
+                                                      AutomationProperties.Name="{Binding ConfiguredWikisText}"
+                                                      ItemsSource="{Binding Wikis}"
+                                                      SelectedItem="{Binding SelectedWiki}"
+                                                      DisplayMemberPath="Name" />
+                                            <TextBox Margin="0,6,0,0"
+                                                     AutomationProperties.Name="{Binding SearchPlaceholderText}"
+                                                     controls:Watermark.Text="{Binding SearchPlaceholderText}"
+                                                     Text="{Binding OnlineFilterText, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+
+                                        <Border Grid.Row="1" Padding="8" Style="{StaticResource PanelBorderStyle}" Background="#FFFFFF">
+                                            <TreeView x:Name="treePages"
+                                                      AutomationProperties.Name="{Binding ConfiguredWikisText}"
+                                                      ItemsSource="{Binding PageTree}"
+                                                      SelectedItemChanged="TreePages_OnSelectedItemChanged">
+                                                <TreeView.ItemContainerStyle>
+                                                    <Style TargetType="TreeViewItem">
+                                                        <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                    </Style>
+                                                </TreeView.ItemContainerStyle>
+                                                <TreeView.ItemTemplate>
+                                                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                        <CheckBox Content="{Binding Title}"
+                                                                  IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                                    </HierarchicalDataTemplate>
+                                                </TreeView.ItemTemplate>
+                                            </TreeView>
+                                        </Border>
+
+                                        <StackPanel Grid.Row="2" Margin="0,10,0,0" Orientation="Horizontal">
+                                            <Button Width="118"
+                                                    Content="{Binding LoadPagesText}"
+                                                    Command="{Binding LoadPagesCommand}"
+                                                    Style="{StaticResource PrimaryActionButtonStyle}" />
+                                            <CheckBox Margin="10,0,0,0"
+                                                      VerticalAlignment="Center"
+                                                      FontWeight="SemiBold"
+                                                      Foreground="#0F6CBD"
+                                                      Content="{Binding RefreshCacheText}"
+                                                      IsChecked="{Binding RefreshCacheBeforeExport}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </TabItem>
+
+                                <!-- Local: open file/folder, listed in the tree below -->
+                                <TabItem Header="{Binding LocalTabText}">
+                                    <Grid Margin="0,8,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                                            <Button Content="{Binding LoadFileText}"
+                                                    Command="{Binding LoadMarkdownFileCommand}"
+                                                    Style="{StaticResource SecondaryActionButtonStyle}" />
+                                            <Button Margin="0,8,0,0"
+                                                    Content="{Binding LoadFolderText}"
+                                                    Command="{Binding LoadMarkdownFolderCommand}"
+                                                    Style="{StaticResource SecondaryActionButtonStyle}" />
+                                            <Button Margin="0,8,0,0"
+                                                    Content="{Binding LoadZipText}"
+                                                    Command="{Binding LoadMarkdownZipCommand}"
+                                                    Style="{StaticResource SecondaryActionButtonStyle}" />
+                                            <TextBox Margin="0,8,0,0"
+                                                     AutomationProperties.Name="{Binding SearchPlaceholderText}"
+                                                     controls:Watermark.Text="{Binding SearchPlaceholderText}"
+                                                     Text="{Binding LocalFilterText, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+
+                                        <Border Grid.Row="1" Padding="8" Style="{StaticResource PanelBorderStyle}" Background="#FFFFFF">
+                                            <Grid>
+                                                <TextBlock Text="{Binding LocalEmptyHintText}"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="#90A0B0"
+                                                           Margin="2"
+                                                           VerticalAlignment="Top">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding LocalPageTree.Count}" Value="0">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TreeView x:Name="treeLocalPages"
+                                                          AutomationProperties.Name="{Binding LocalTabText}"
+                                                          Background="Transparent"
+                                                          BorderThickness="0"
+                                                          ItemsSource="{Binding LocalPageTree}"
+                                                          SelectedItemChanged="TreeLocalPages_OnSelectedItemChanged">
+                                                    <TreeView.ItemContainerStyle>
+                                                        <Style TargetType="TreeViewItem">
+                                                            <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                        </Style>
+                                                    </TreeView.ItemContainerStyle>
+                                                    <TreeView.ItemTemplate>
+                                                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                                            <CheckBox Content="{Binding Title}"
+                                                                      IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                                        </HierarchicalDataTemplate>
+                                                    </TreeView.ItemTemplate>
+                                                </TreeView>
+                                            </Grid>
+                                        </Border>
+
+                                        <Button Grid.Row="2"
+                                                Margin="0,10,0,0"
+                                                HorizontalAlignment="Left"
+                                                Width="118"
+                                                Content="{Binding LoadPagesText}"
+                                                Command="{Binding LoadLocalPagesCommand}"
+                                                Visibility="{Binding ShowLoadLocalPagesButton, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                Style="{StaticResource PrimaryActionButtonStyle}" />
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+
+                            <!-- Shared rendering options -->
+                            <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                                <CheckBox VerticalAlignment="Center"
+                                          Content="{Binding DarkModeText}"
+                                          IsChecked="{Binding UseDarkMode}" />
+                                <StackPanel Margin="0,8,0,0">
+                                    <TextBlock Margin="0,0,0,4"
+                                               Foreground="#546476"
+                                               Text="{Binding CodeThemeText}" />
+                                    <ComboBox AutomationProperties.Name="{Binding CodeThemeText}"
+                                              ItemsSource="{Binding CodeThemes}"
+                                              SelectedItem="{Binding SelectedCodeTheme}"
+                                              DisplayMemberPath="ThemeName" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Column="2" Padding="8" Style="{StaticResource PanelBorderStyle}" ClipToBounds="True" Background="#FFFFFF">
+                            <Grid ClipToBounds="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Margin="0,0,0,8" LastChildFill="False">
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                        <Button Width="90"
+                                            Content="{Binding PreviousPageText}"
+                                            Command="{Binding PreviousPageCommand}"
+                                            IsEnabled="{Binding CanNavigatePrevious}"
+                                            Style="{StaticResource SecondaryActionButtonStyle}" />
+                                        <Button Width="90"
+                                            Margin="8,0,0,0"
+                                            Content="{Binding NextPageText}"
+                                            Command="{Binding NextPageCommand}"
+                                            IsEnabled="{Binding CanNavigateNext}"
+                                            Style="{StaticResource SecondaryActionButtonStyle}" />
+                                    </StackPanel>
+                                    <TextBlock DockPanel.Dock="Right"
+                                               Margin="14,5,0,0"
+                                               FontWeight="SemiBold"
+                                               Foreground="#546476"
+                                               Text="{Binding PageNavigationText}" />
+                                </DockPanel>
+
+                                <wv2:WebView2 Grid.Row="1"
+                                              x:Name="wbPreview"
+                                              AutomationProperties.Name="{Binding PreviewTabText}"
+                                              Focusable="False" />
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" Margin="0,10,0,0" Padding="10" Style="{StaticResource PanelBorderStyle}" Background="#FFFFFF">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <!-- Widened (was 430) so the scope radios and
+                                         export-option checkboxes don't clip the
+                                         longer English labels. -->
+                                    <ColumnDefinition Width="560" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.NavAi}"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#546476"
+                                                   Margin="0,0,10,0"/>
+                                        <Button x:Name="btnAiSummary"
+                                                Margin="0,0,6,0"
+                                                MinWidth="112"
+                                                Content="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.SummaryText}"
+                                                IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.CanRunAiActions}"
+                                                Click="BtnAiSummary_Click"
+                                                Style="{StaticResource SecondaryActionButtonStyle}" />
+                                        <Button x:Name="btnAiIndex"
+                                                Margin="0,0,6,0"
+                                                MinWidth="112"
+                                                Content="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.IndexText}"
+                                                IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.CanRunAiActions}"
+                                                Click="BtnAiIndex_Click"
+                                                Style="{StaticResource SecondaryActionButtonStyle}" />
+                                        <Button x:Name="btnAiQuiz"
+                                                MinWidth="112"
+                                                Content="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.QuizText}"
+                                                IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.CanRunAiActions}"
+                                                Click="BtnAiQuiz_Click"
+                                                Style="{StaticResource SecondaryActionButtonStyle}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox x:Name="txtAiQuestion"
+                                                 Width="320"
+                                                 Margin="0,0,6,0"
+                                                 VerticalContentAlignment="Center"
+                                                 ToolTip="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.QuestionLabelText}"
+                                                 Text="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.Question, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button x:Name="btnAiAsk"
+                                                MinWidth="112"
+                                                Content="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.AskText}"
+                                                IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.AiCenter.CanAsk}"
+                                                Click="BtnAiAsk_Click"
+                                                Style="{StaticResource PrimaryActionButtonStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid Grid.Column="1" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="180"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0"
+                                            Padding="10,8"
+                                            Background="#F4F7FB"
+                                            BorderBrush="#DCE5F0"
+                                            BorderThickness="1"
+                                            CornerRadius="7">
+                                        <StackPanel>
+                                            <RadioButton Content="{Binding CurrentDocumentText}"
+                                                         IsChecked="{Binding IsCurrentScope}"
+                                                         Margin="0,0,0,6" />
+                                            <RadioButton Content="{Binding AllLoadedPagesText}"
+                                                         IsChecked="{Binding IsAllLoadedPagesScope}"
+                                                         Margin="0,0,0,6" />
+                                            <CheckBox Content="{Binding IncludeAiPagesText}"
+                                                      IsChecked="{Binding IncludeAdditionalPages}"
+                                                      Margin="0,0,0,6" />
+                                            <CheckBox Content="{Binding ApplyWordFineTuneText}"
+                                                      IsChecked="{Binding ApplyWordFineTune}"
+                                                      IsEnabled="{Binding CanApplyWordFineTune}"
+                                                      Visibility="{Binding IsWordFineTuneVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            <CheckBox Content="{Binding OfflineExportText}"
+                                                      IsChecked="{Binding OfflineExport}"
+                                                      Margin="0,0,0,6" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="2">
+                                        <Button Margin="0,0,0,8"
+                                                Width="180"
+                                                Command="{Binding ExportWordCommand}"
+                                                Style="{StaticResource PrimaryActionButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Image Source="pack://siteoforigin:,,,/Assets/icons/word.png" Width="14" Height="14" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding ExportWordText}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Width="180"
+                                                Command="{Binding ExportPdfCommand}"
+                                                Style="{StaticResource SecondaryActionButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Image Source="pack://siteoforigin:,,,/Assets/icons/pdf.png" Width="14" Height="14" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding ExportPdfText}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <wv2:WebView2 x:Name="wbPrintHost"
+                      Width="1"
+                      Height="1"
+                      IsHitTestVisible="False"
+                      Visibility="Hidden"
+                      Focusable="False"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top" />
+
+        <!-- Offscreen host that renders Mermaid diagrams locally (no mermaid.ink)
+             for Word/PDF export. Resized per diagram before capture. -->
+        <wv2:WebView2 x:Name="wbMermaidHost"
+                      Width="10"
+                      Height="10"
+                      IsHitTestVisible="False"
+                      Visibility="Hidden"
+                      Focusable="False"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top" />
+
+    </Grid>
+</UserControl>

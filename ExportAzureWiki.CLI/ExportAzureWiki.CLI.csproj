@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>ExportAzureWiki.CLI</AssemblyName>
+    <UseWindowsForms>false</UseWindowsForms>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExportAzureWiki.Platform\ExportAzureWiki.Platform.csproj" />
+    <ProjectReference Include="..\ExportAzureWiki.Core\ExportAzureWiki.Core.csproj" />
+  </ItemGroup>
+
+</Project>

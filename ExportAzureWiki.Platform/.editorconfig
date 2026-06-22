@@ -1,0 +1,6 @@
+# Platform is a library: awaits must not capture the caller's
+# SynchronizationContext, otherwise sync-over-async callers (some of the data/
+# auth layer is still invoked via .GetAwaiter().GetResult()) can deadlock the
+# WPF UI thread. CA2007 enforces ConfigureAwait(false) here.
+[*.cs]
+dotnet_diagnostic.CA2007.severity = warning

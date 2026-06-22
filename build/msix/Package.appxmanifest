@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX package manifest for the ExportAzureWiki WPF desktop app.
+
+  This is a TEMPLATE: Build-Msix.ps1 replaces the {VERSION}, {PUBLISHER}
+  and {PUBLISHER_DISPLAY} tokens before calling MakeAppx.
+
+  IMPORTANT: Identity/@Publisher must match the signing certificate's
+  Subject EXACTLY (e.g. "CN=Ti com Café, O=Ti com Café, C=BR"), or
+  Windows rejects the package at install time. New-SigningCert.ps1 prints
+  the exact subject to use.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="TicomCafe.ExportAzureWiki"
+    Publisher="{PUBLISHER}"
+    Version="{VERSION}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <!-- User-facing name (Start menu, installer UI). The package Identity
+         Name stays TicomCafe.ExportAzureWiki so upgrades keep working. -->
+    <DisplayName>AWikiExport</DisplayName>
+    <PublisherDisplayName>{PUBLISHER_DISPLAY}</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.17763.0"
+      MaxVersionTested="10.0.22631.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="pt-BR" />
+    <Resource Language="en-US" />
+  </Resources>
+
+  <Capabilities>
+    <!-- Full-trust Win32 (WPF) app: needs runFullTrust. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+
+  <Applications>
+    <Application
+      Id="ExportAzureWiki"
+      Executable="ExportAzureWiki.Wpf.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="AWikiExport"
+        Description="Read, render and export Azure DevOps wiki content to Word, PDF and HTML."
+        BackgroundColor="transparent"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile Square71x71Logo="Images\Square71x71Logo.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+</Package>

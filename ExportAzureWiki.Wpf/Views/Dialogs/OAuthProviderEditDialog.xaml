@@ -1,0 +1,77 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.OAuthProviderEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ExportAzureWiki.Wpf.Controls"
+        Title="{Binding DialogTitle}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        MinWidth="620"
+        MinHeight="520"
+        Width="720"
+        Height="640"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}" Padding="14">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding DialogTitle}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+
+            <TextBlock Grid.Row="1" Text="{Binding ProviderTypeText}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="8,0,0,8" ItemsSource="{Binding ProviderOptions}" SelectedItem="{Binding SelectedProviderType}" />
+
+            <TextBlock Grid.Row="2" Text="{Binding DisplayNameText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0,0,8" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="3" Text="{Binding ClientIdText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="3" Grid.Column="1" Margin="8,0,0,8" Text="{Binding ClientId, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="4" Text="{Binding ClientSecretText}" VerticalAlignment="Center" Visibility="{Binding ClientSecretVisibility}" />
+            <controls:SensitiveTextBox Grid.Row="4"
+                                       Grid.Column="1"
+                                       Margin="8,0,0,8"
+                                       Text="{Binding ClientSecret, UpdateSourceTrigger=PropertyChanged}"
+                                       Visibility="{Binding ClientSecretVisibility}" />
+
+            <TextBlock Grid.Row="5" Text="{Binding TenantIdText}" VerticalAlignment="Center" Visibility="{Binding TenantIdVisibility}" />
+            <TextBox Grid.Row="5" Grid.Column="1" Margin="8,0,0,8" Text="{Binding TenantId, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding TenantIdVisibility}" />
+
+            <TextBlock Grid.Row="6" Text="{Binding RedirectUriText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="6" Grid.Column="1" Margin="8,0,0,8" Text="{Binding RedirectUri, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="7" Text="{Binding ScopesText}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="7" Grid.Column="1" Margin="8,0,0,8" Text="{Binding Scopes, UpdateSourceTrigger=PropertyChanged}" />
+
+            <CheckBox Grid.Row="8" Grid.ColumnSpan="2" Content="{Binding EnabledText}" IsChecked="{Binding IsEnabled}" />
+
+            <TextBlock Grid.Row="9" Grid.ColumnSpan="2" Margin="0,12,0,0" Foreground="#54636C" TextWrapping="Wrap"
+                       Text="{Binding HelperText}" />
+        </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="{Binding CancelText}" Width="120" Margin="0,0,8,0" Click="BtnCancel_OnClick" Style="{StaticResource SecondaryActionButtonStyle}"/>
+            <Button Content="{Binding SaveText}" Width="140" Click="BtnSave_OnClick" Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

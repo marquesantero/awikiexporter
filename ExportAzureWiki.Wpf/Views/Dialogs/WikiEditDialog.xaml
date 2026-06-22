@@ -1,0 +1,186 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.WikiEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ExportAzureWiki.Wpf.Controls"
+        Title="{Binding DialogTitle}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        MinWidth="700"
+        MinHeight="640"
+        Width="820"
+        Height="760"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}" Padding="14">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding DialogTitle}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+
+                <TextBlock Grid.Row="1" Text="{Binding NameText}" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0,0,8" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="2" Text="{Binding PlatformText}" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="8,0,0,8" ItemsSource="{Binding Platforms}" SelectedItem="{Binding Platform}" />
+
+                <TextBlock Grid.Row="3" Text="{Binding AuthTypeText}" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="3" Grid.Column="1" Margin="8,0,0,8" ItemsSource="{Binding AuthTypes}" SelectedItem="{Binding AuthType}" />
+
+                <TextBlock Grid.Row="4" Text="{Binding BaseUrlText}" VerticalAlignment="Center" />
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="8,0,0,8" Text="{Binding OrganizationUrl, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="5" Text="{Binding StartPointsText}" VerticalAlignment="Top" Margin="0,4,8,0" />
+                <Grid Grid.Row="5" Grid.Column="1" Margin="8,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            MinHeight="64"
+                            MaxHeight="160"
+                            VerticalAlignment="Top"
+                            BorderBrush="{StaticResource GridBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Background="#FCFDFF">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,6">
+                            <ItemsControl ItemsSource="{Binding ConfiguredStartPoints}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding}"
+                                                  IsChecked="True"
+                                                  IsEnabled="False"
+                                                  Margin="0,1" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Button Grid.Column="1"
+                            Margin="8,0,0,0"
+                            Width="120"
+                            VerticalAlignment="Top"
+                            Content="{Binding TestConnectionText}"
+                            Click="BtnTestConnection_OnClick"
+                            Style="{StaticResource SecondaryActionButtonStyle}" />
+
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Width="140"
+                            VerticalAlignment="Top"
+                            Content="{Binding SelectStartPointsText}"
+                            IsEnabled="{Binding CanSelectStartPoints}"
+                            Click="BtnSelectStartPoints_OnClick"
+                            Style="{StaticResource SecondaryActionButtonStyle}" />
+                </Grid>
+
+                <TextBlock Grid.Row="6" Text="{Binding DynamicFieldsText}" VerticalAlignment="Top" Margin="0,4,8,0" />
+                <Border Grid.Row="6" Grid.Column="1" Margin="8,0,0,8" BorderBrush="{StaticResource GridBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8" Background="#FCFDFF">
+                    <ItemsControl ItemsSource="{Binding DynamicFields}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" Margin="0,0,8,0" TextWrapping="Wrap" />
+                                    <Grid Grid.Column="1" Margin="8,0,0,0">
+                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSensitive}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsChoice}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+                                        <controls:SensitiveTextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}">
+                                            <controls:SensitiveTextBox.Style>
+                                                <Style TargetType="controls:SensitiveTextBox">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSensitive}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsChoice}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </controls:SensitiveTextBox.Style>
+                                        </controls:SensitiveTextBox>
+                                        <ItemsControl ItemsSource="{Binding Options}" VerticalAlignment="Center">
+                                            <ItemsControl.Style>
+                                                <Style TargetType="ItemsControl">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsChoice}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ItemsControl.Style>
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <RadioButton Content="{Binding Label}"
+                                                                 GroupName="{Binding GroupName}"
+                                                                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                 Margin="0,0,16,0"
+                                                                 VerticalAlignment="Center" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <CheckBox Grid.Row="7" Grid.ColumnSpan="2" Content="{Binding ActiveText}" IsChecked="{Binding IsActive}" Margin="0,2,0,0" />
+                <CheckBox Grid.Row="8" Grid.ColumnSpan="2" Content="{Binding DefaultText}" IsChecked="{Binding IsDefault}" Margin="0,2,0,0" />
+            </Grid>
+        </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="{Binding CancelText}" Width="120" Margin="0,0,8,0" Click="BtnCancel_OnClick" Style="{StaticResource SecondaryActionButtonStyle}"/>
+            <Button Content="{Binding SaveText}" Width="140" Click="BtnSave_OnClick" Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,88 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.ManageDataDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        MinWidth="540"
+        MinHeight="560"
+        Width="600"
+        Height="620"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}" Padding="16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock x:Name="TitleText" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+
+                    <!-- DATA (configured DB) - admin only -->
+                    <Border x:Name="DataSection"
+                            BorderBrush="{StaticResource GridBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Background="#FCFDFF"
+                            Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock x:Name="DataSectionHeader" FontWeight="SemiBold" Margin="0,0,0,10" />
+
+                            <CheckBox x:Name="ChkWikis" Margin="0,2" />
+                            <CheckBox x:Name="ChkAi" Margin="0,2" />
+                            <CheckBox x:Name="ChkOAuth" Margin="0,2" />
+
+                            <TextBlock x:Name="SecretsWarning"
+                                       Margin="0,10,0,0"
+                                       FontSize="11"
+                                       Foreground="#8A6D00"
+                                       TextWrapping="Wrap" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <Button x:Name="BtnExport"
+                                        MinWidth="150"
+                                        Margin="0,0,8,0"
+                                        Click="BtnExport_OnClick"
+                                        Style="{StaticResource SecondaryActionButtonStyle}" />
+                                <Button x:Name="BtnImport"
+                                        MinWidth="110"
+                                        Margin="0,0,8,0"
+                                        Click="BtnImport_OnClick"
+                                        Style="{StaticResource SecondaryActionButtonStyle}" />
+                                <Button x:Name="BtnClear"
+                                        MinWidth="150"
+                                        Click="BtnClear_OnClick"
+                                        Style="{StaticResource SecondaryActionButtonStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- LOCAL machine reset - everyone -->
+                    <Border BorderBrush="{StaticResource GridBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="14"
+                            Background="#FFF9F9">
+                        <StackPanel>
+                            <TextBlock x:Name="LocalSectionHeader" FontWeight="SemiBold" Margin="0,0,0,8" />
+                            <TextBlock x:Name="LocalNote" TextWrapping="Wrap" Foreground="#5D6877" FontSize="12" Margin="0,0,0,12" />
+                            <Button x:Name="BtnLocalReset"
+                                    HorizontalAlignment="Left"
+                                    MinWidth="260"
+                                    Click="BtnLocalReset_OnClick"
+                                    Style="{StaticResource SecondaryActionButtonStyle}" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock x:Name="StatusText" Margin="0,14,0,0" TextWrapping="Wrap" Foreground="#334" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button x:Name="BtnClose" Width="120" Click="BtnClose_OnClick" Style="{StaticResource PrimaryActionButtonStyle}" />
+        </StackPanel>
+    </Grid>
+</Window>

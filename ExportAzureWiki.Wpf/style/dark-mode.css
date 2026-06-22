@@ -1,0 +1,77 @@
+﻿@font-face {
+    font-family: 'CalibriRegular';
+    src: url('fonts/calibri-regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'CalibriBold';
+    src: url('fonts/calibri-bold.ttf') format('truetype');
+}
+
+a {
+    color: #3399ff; /* Azure blue for links */
+    text-decoration: none;
+}
+
+body, p, li {
+    line-height: 1.4;
+}
+
+pre code {
+    line-height: 1;
+}
+
+a:hover {
+    color: #66ccff; /* Lighter blue for hover effect */
+    text-decoration: underline;
+}
+
+body {
+    font-family: 'CalibriRegular', Arial, sans-serif;
+    padding: 20px;
+    background-color: #1e1e1e; /* Dark background for body */
+    color: #e0e0e0; /* Light text color */
+}
+
+h2 {
+    font-family: 'CalibriBold', Arial, sans-serif;
+    color: #ffffff; /* White for headings */
+}
+
+pre code {
+    display: block;
+    padding: 1em;
+    background: #252526; /* Dark gray background for code */
+    border-radius: 5px;
+    color: #dcdcdc; /* Light gray text for code */
+}
+
+/* Estilos gerais para o conteúdo */
+.content-body {
+    background-color: #1e1e1e; /* Dark gray body background */
+    color: #e0e0e0; /* Light text color */
+    font-family: 'CalibriRegular', Arial, sans-serif;
+    padding: 20px;
+}
+
+    .content-body h2 {
+        font-family: 'CalibriBold', Arial, sans-serif;
+        color: #ffffff;
+    }
+
+/* Estilos para imagens responsivas */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+}
+
+.image-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+    .image-container img {
+        cursor: pointer;
+    }

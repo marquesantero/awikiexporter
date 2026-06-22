@@ -1,0 +1,51 @@
+<UserControl x:Class="ExportAzureWiki.Wpf.Controls.SensitiveTextBox"
+             x:Name="root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinHeight="28">
+    <Border BorderBrush="#D5DEE9"
+            BorderThickness="1"
+            CornerRadius="4"
+            Background="White">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="34" />
+            </Grid.ColumnDefinitions>
+
+            <PasswordBox x:Name="HiddenPasswordBox"
+                         Grid.Column="0"
+                         Margin="8,0,0,0"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         VerticalContentAlignment="Center"
+                         PasswordChanged="HiddenPasswordBox_OnPasswordChanged" />
+
+            <TextBox x:Name="MaskedReadOnlyTextBox"
+                     Grid.Column="0"
+                     Margin="8,0,0,0"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     IsReadOnly="True"
+                     VerticalContentAlignment="Center" />
+
+            <TextBox x:Name="VisibleTextBox"
+                     Grid.Column="0"
+                     Margin="8,0,0,0"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     VerticalContentAlignment="Center"
+                     TextChanged="VisibleTextBox_OnTextChanged" />
+
+            <Button x:Name="ToggleButton"
+                    Grid.Column="1"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Cursor="Hand"
+                    FontFamily="Segoe MDL2 Assets"
+                    FontSize="14"
+                    Foreground="#5D6877"
+                    Click="ToggleButton_OnClick" />
+        </Grid>
+    </Border>
+</UserControl>

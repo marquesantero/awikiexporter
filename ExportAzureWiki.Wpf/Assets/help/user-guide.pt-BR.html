@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AWiki Exporter - Manual do Usuario</title>
+  <style>
+    :root{--bg:#f4f7fb;--panel:#fff;--ink:#1f2937;--muted:#5b6676;--line:#d7deea;--brand:#0f6cbd;--nav:#0f172a;--navink:#dbeafe;--ok:#166534;--warn:#92400e}
+    *{box-sizing:border-box} html,body{margin:0} body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    .layout{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+    .nav{position:sticky;top:0;height:100vh;overflow:auto;background:var(--nav);color:var(--navink);padding:18px 14px}
+    .nav h1{margin:0 0 8px 0;font-size:17px} .nav p{margin:0 0 12px 0;color:#9fb4d6;font-size:12px;line-height:1.4}
+    .nav a{display:block;color:var(--navink);text-decoration:none;padding:7px 9px;border-radius:8px;font-size:13px;margin-bottom:2px}
+    .nav a:hover{background:#1e293b}
+    .nav .group{margin:12px 0 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#7e93b8}
+    .main{padding:20px 24px 34px}
+    .hero{background:linear-gradient(135deg,#0f6cbd,#0b4f8a);border:1px solid #0b5aa0;color:#fff;border-radius:12px;padding:16px 18px}
+    .hero h2{margin:0 0 6px 0;font-size:23px} .hero p{margin:0;font-size:14px;line-height:1.5;color:#e9f2ff}
+    section{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+    h3{margin:0 0 10px 0;color:#123f6a} h4{margin:14px 0 6px 0;color:#0f355a;font-size:15px}
+    p{margin:6px 0;line-height:1.58} ol,ul{margin:6px 0 6px 20px} li{margin:4px 0;line-height:1.52}
+    code{background:#eef3f9;border:1px solid #d4dce8;border-radius:6px;padding:1px 6px;font-size:12px}
+    .tip,.warn,.ok{padding:9px 11px;border-radius:10px;margin-top:8px;border:1px solid transparent}
+    .tip{background:#eef5ff;border-color:#cfe2fb;color:#18406a}
+    .warn{background:#fff7eb;border-color:#f7d7b0;color:var(--warn)}
+    .ok{background:#ecfdf3;border-color:#c5ead4;color:var(--ok)}
+    table{width:100%;border-collapse:collapse;margin-top:8px} th,td{border:1px solid var(--line);padding:8px 9px;text-align:left;vertical-align:top} th{background:#f4f8fd;color:#274769}
+    .small{font-size:12px;color:var(--muted)}
+    .pill{display:inline-block;background:#eef3f9;border:1px solid #d4dce8;border-radius:20px;padding:1px 9px;font-size:11px;margin-left:4px;color:#274769}
+    @media (max-width:980px){.layout{display:block}.nav{position:relative;height:auto}.main{padding:14px}}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="nav">
+    <h1>Manual AWiki Exporter</h1>
+    <p>Guia pratico para o usuario final operar todas as telas.</p>
+    <div class="group">Comecando</div>
+    <a href="#inicio">1. Primeiro Acesso</a>
+    <a href="#login">2. Login</a>
+    <a href="#workspace">3. Workspace</a>
+    <div class="group">Configuracao</div>
+    <a href="#wikis">4. Cadastrar Wiki</a>
+    <a href="#wiki-campos">4.1 Campos por Plataforma</a>
+    <a href="#wiki-auth">4.2 Tipos de Autenticacao</a>
+    <a href="#wiki-startpoints">4.3 Start Points</a>
+    <a href="#users">5. Usuarios e Grupos</a>
+    <a href="#permissions">6. Permissoes</a>
+    <a href="#providers">7. Providers</a>
+    <div class="group">Uso diario</div>
+    <a href="#ai">8. IA no Conteudo</a>
+    <a href="#export">9. Exportar Word/PDF</a>
+    <a href="#token">10. Token de Conexao</a>
+    <a href="#dados">11. Gerenciar Dados</a>
+    <div class="group">Referencia</div>
+    <a href="#rotina">12. Rotina Recomendada</a>
+    <a href="#erros">13. Erros Comuns</a>
+    <a href="#glossario">14. Glossario e FAQ</a>
+  </aside>
+
+  <main class="main">
+    <div class="hero" id="inicio">
+      <h2>Manual do Usuario</h2>
+      <p>Este manual ensina como executar cada tarefa na aplicacao: instalacao inicial, cadastro de wikis, usuarios, permissoes, providers, IA e exportacao. Use o menu lateral para ir direto ao topico.</p>
+    </div>
+
+    <section>
+      <h3>1. Primeiro Acesso (Onboarding)</h3>
+      <h4>Quando aparece</h4>
+      <p>Na primeira execucao da aplicacao em uma maquina sem configuracao inicial. O assistente tem ate 5 etapas.</p>
+      <h4>Etapa 1 - Idioma</h4>
+      <p>Escolha <b>Portugues</b> ou <b>English</b>. Toda a interface, inclusive o restante do assistente, passa a respeitar o idioma escolhido.</p>
+      <h4>Etapa 2 - Modo de instalacao</h4>
+      <ul>
+        <li><b>Nova instalacao</b>: cria o banco do zero (tabelas + provedores padrao) e um usuario administrador.</li>
+        <li><b>Base existente</b>: aponta para um banco ja criado por outra maquina/equipe. Nesse modo a etapa de criar admin e pulada.</li>
+      </ul>
+      <h4>Etapa 3 - Banco de dados</h4>
+      <p>Selecione o tipo de banco. Ao escolher, a <b>porta padrao</b> e preenchida automaticamente e o nome padrao do banco e <code>AWikiExporterDB</code>.</p>
+      <table>
+        <thead><tr><th>Tipo</th><th>Campos</th><th>Porta padrao</th><th>Observacao</th></tr></thead>
+        <tbody>
+          <tr><td><b>SQLite</b></td><td>Apenas arquivo (.db)</td><td>-</td><td>Local, sem servidor. Ideal para uso individual/teste.</td></tr>
+          <tr><td><b>SQL Server</b></td><td>Servidor, banco, usuario, senha</td><td>1433</td><td>Suporta autenticacao Windows.</td></tr>
+          <tr><td><b>PostgreSQL</b></td><td>Servidor, banco, usuario, senha</td><td>5432</td><td>-</td></tr>
+          <tr><td><b>MySQL</b></td><td>Servidor, banco, usuario, senha</td><td>3306</td><td>-</td></tr>
+        </tbody>
+      </table>
+      <h4>Opcoes avancadas (bancos de servidor)</h4>
+      <ul>
+        <li><b>Confiar no certificado do servidor</b>: marque quando o servidor usa um certificado TLS interno/auto-assinado (erro de "cadeia de certificados nao confiavel").</li>
+        <li><b>Autenticacao Windows</b> <span class="pill">somente SQL Server</span>: usa o usuario do Windows atual; os campos usuario/senha ficam ocultos.</li>
+      </ul>
+      <h4>Etapa 4 - Administrador</h4>
+      <ol>
+        <li>Informe usuario, e-mail (opcional) e senha.</li>
+        <li>A lista de <b>politicas de senha</b> e marcada em tempo real conforme voce digita (maiuscula, minuscula, numero, simbolo, tamanho minimo).</li>
+        <li>Confirme a senha e avance.</li>
+      </ol>
+      <h4>Etapa 5 - Conclusao</h4>
+      <p>Clique em <b>Iniciar Aplicacao</b>. A tela de login abre em seguida (sem precisar reabrir o app).</p>
+      <div class="tip">Se sua equipe ja tem um <b>token de conexao</b> (secao 10), o modo "base existente" + token reduz erros de configuracao manual do banco.</div>
+    </section>
+
+    <section id="login">
+      <h3>2. Login</h3>
+      <h4>Login local</h4>
+      <ol>
+        <li>Preencha <code>Usuario</code> e <code>Senha</code>.</li>
+        <li>Clique em <b>Entrar</b>.</li>
+      </ol>
+      <h4>Login Azure</h4>
+      <ol>
+        <li>Clique em <b>Entrar com Azure</b>.</li>
+        <li>Conclua a autenticacao no provedor (navegador/identidade corporativa).</li>
+      </ol>
+      <div class="warn">Mesmo no Azure, o usuario precisa existir (ou ter sido importado) no cadastro local para obter acesso.</div>
+      <div class="tip">Apos varias tentativas com senha errada a conta pode entrar em <b>bloqueio temporario</b> (lockout). Aguarde o tempo indicado ou peca a um administrador para liberar.</div>
+      <h4>Apos o login</h4>
+      <p>O app verifica se existe alguma wiki configurada. Se nao houver e voce for admin, voce e direcionado para o <b>Wiki Management</b> para cadastrar a primeira.</p>
+    </section>
+
+    <section id="workspace">
+      <h3>3. Workspace (uso diario)</h3>
+      <h4>Carregar paginas da wiki</h4>
+      <ol>
+        <li>Selecione a wiki no combo de wikis.</li>
+        <li>Na arvore, marque as paginas/pastas desejadas.</li>
+        <li>Clique em <b>Load Pages</b> (Carregar Paginas).</li>
+        <li>Navegue com <b>Previous</b> e <b>Next</b>.</li>
+      </ol>
+      <h4>Opcoes importantes</h4>
+      <ul>
+        <li><b>Refresh Cache</b>: recarrega o conteudo a partir da origem (descarta o cache local).</li>
+        <li><b>Dark Mode</b>: altera apenas a visualizacao.</li>
+        <li><b>Code Theme</b>: muda o estilo dos blocos de codigo.</li>
+        <li><b>Open .md File</b>: carrega um markdown local do seu disco.</li>
+      </ul>
+      <div class="ok">No topo do workspace voce ve o caminho da pagina atual e a data da ultima atualizacao renderizada.</div>
+    </section>
+
+    <section id="wikis">
+      <h3>4. Cadastrar Wiki (Wiki Management)</h3>
+      <h4>Criar nova wiki</h4>
+      <ol>
+        <li>Acesse <b>Wiki Management</b>.</li>
+        <li>Clique em <b>Novo</b>.</li>
+        <li>Preencha <b>Nome</b>, escolha a <b>Plataforma</b> e o <b>Tipo de Autenticacao</b>.</li>
+        <li>Informe a <b>Organization URL</b> e os <b>campos da plataforma</b> (veja 4.1).</li>
+        <li>Clique em <b>Test Connection</b> para validar.</li>
+        <li>Clique em <b>Pages</b> e selecione os start points (ou deixe vazio para tudo - veja 4.3).</li>
+        <li>Clique em <b>Salvar</b>.</li>
+      </ol>
+      <h4>Editar / Excluir</h4>
+      <ul>
+        <li><b>Editar</b>: selecione a wiki no grid, clique em <b>Editar</b>, altere e <b>Salvar</b>.</li>
+        <li><b>Excluir</b>: selecione a wiki, clique em <b>Excluir</b> e confirme.</li>
+      </ul>
+      <div class="warn">Ao excluir uma wiki, as permissoes e o cache vinculados sao limpos pelo sistema.</div>
+    </section>
+
+    <section id="wiki-campos">
+      <h3>4.1 Campos por Plataforma</h3>
+      <p>Os campos sob <b>Platform Data</b> mudam conforme a plataforma escolhida. Abaixo as duas plataformas principais.</p>
+
+      <h4>Azure DevOps</h4>
+      <table>
+        <thead><tr><th>Campo</th><th>Exemplo</th><th>Descricao</th></tr></thead>
+        <tbody>
+          <tr><td>Organization URL</td><td><code>https://dev.azure.com/minhaorg</code></td><td>URL da organizacao.</td></tr>
+          <tr><td>Project</td><td><code>MeuProjeto</code></td><td>Nome do projeto.</td></tr>
+          <tr><td>Wiki</td><td><code>MeuProjeto.wiki</code></td><td>Nome da wiki dentro do projeto.</td></tr>
+          <tr><td>Repository</td><td><code>(opcional)</code></td><td>Id do repositorio, quando aplicavel.</td></tr>
+          <tr><td>Token</td><td><code>PAT</code></td><td>Personal Access Token com leitura de Wiki/Code.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>GitHub</h4>
+      <table>
+        <thead><tr><th>Campo</th><th>Exemplo</th><th>Descricao</th></tr></thead>
+        <tbody>
+          <tr><td>Organization URL</td><td>vazio ou <code>https://github.com</code></td><td>So preencha para <b>GitHub Enterprise</b>; em github.com o padrao ja e usado.</td></tr>
+          <tr><td>Owner</td><td><code>marquesantero</code></td><td>Dono ou organizacao do repositorio.</td></tr>
+          <tr><td>Repository</td><td><code>awikiexporter</code></td><td>Nome exato do repo, <b>sem</b> <code>.git</code>.</td></tr>
+          <tr><td>Source</td><td><b>Repository</b> / Wiki</td><td>Radio. <b>Repository</b> = arquivos .md do repo. <b>Wiki</b> = a aba Wiki do GitHub (<code>...wiki.git</code>).</td></tr>
+          <tr><td>Branch</td><td><code>main</code></td><td>Branch a ser lido (modo Repository).</td></tr>
+          <tr><td>Docs Path</td><td><code>docs</code> ou <b>vazio</b></td><td><b>vazio = repositorio inteiro</b> (todos os .md da raiz e de todas as subpastas). Preenchido = somente aquela pasta.</td></tr>
+          <tr><td>Token</td><td><code>PAT</code></td><td>Veja escopos em 4.2.</td></tr>
+        </tbody>
+      </table>
+      <div class="warn">Erro mais comum: <b>nome do repositorio incorreto</b> (ex.: <code>awikiexport</code> em vez de <code>awikiexporter</code>). Com nome errado o teste pode nao acusar erro mas <b>nenhuma pagina</b> e listada.</div>
+      <div class="tip">Para trazer <b>tudo</b> (incluindo README.md, CHANGELOG.md etc. na raiz), deixe o <b>Docs Path em branco</b>.</div>
+
+      <h4>GitLab</h4>
+      <table>
+        <thead><tr><th>Campo</th><th>Exemplo</th><th>Descricao</th></tr></thead>
+        <tbody>
+          <tr><td>Organization URL</td><td>vazio ou <code>https://gitlab.minhaempresa.com</code></td><td>So preencha para <b>GitLab self-managed</b>; em gitlab.com o padrao ja e usado.</td></tr>
+          <tr><td>Project ID</td><td><code>group/project</code> ou <code>12345678</code></td><td>Caminho <b>grupo/projeto</b> (aceita subgrupos: <code>grupo/sub/projeto</code>) <b>ou</b> o ID numerico do projeto (Settings &rarr; General).</td></tr>
+          <tr><td>Source</td><td><b>Repository</b> / Wiki</td><td>Radio. <b>Repository</b> = arquivos .md do repo. <b>Wiki</b> = a wiki do projeto (API Wikis).</td></tr>
+          <tr><td>Branch</td><td><code>main</code></td><td>Branch a ser lido (modo Repository).</td></tr>
+          <tr><td>Docs Path</td><td><code>docs</code> ou <b>vazio</b></td><td><b>vazio = repositorio inteiro</b> (todos os .md da raiz e de todas as subpastas). Preenchido = somente aquela pasta.</td></tr>
+          <tr><td>Token</td><td><code>PAT</code></td><td>Personal Access Token com escopo <code>read_api</code> (ou <code>read_repository</code> para o modo Repository).</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">O <b>Project ID</b> aceita tanto o caminho <code>grupo/projeto</code> quanto o ID numerico &mdash; o caminho e codificado automaticamente para a API.</div>
+    </section>
+
+    <section id="wiki-auth">
+      <h3>4.2 Tipos de Autenticacao</h3>
+      <table>
+        <thead><tr><th>Tipo</th><th>Campos</th><th>Quando usar</th></tr></thead>
+        <tbody>
+          <tr><td><b>Personal Access Token</b></td><td>Token (GitHub/Azure) ou App Password (Bitbucket)</td><td>Caso mais comum. Recomendado.</td></tr>
+          <tr><td><b>Basic Auth</b></td><td>Usuario + Senha</td><td>Servidores que exigem usuario/senha.</td></tr>
+          <tr><td><b>API Key</b></td><td>API Key</td><td>Integracoes baseadas em chave.</td></tr>
+          <tr><td><b>OAuth</b></td><td>Client ID, Secret, Tenant, Scopes, Redirect URI</td><td>Fluxo corporativo via provider OAuth.</td></tr>
+        </tbody>
+      </table>
+      <h4>Escopo do token GitHub</h4>
+      <ul>
+        <li><b>Fine-grained PAT</b>: acesso ao repo com permissao <code>Contents: Read-only</code>.</li>
+        <li><b>Classic PAT</b>: escopo <code>repo</code> (ou <code>public_repo</code> se o repositorio for publico).</li>
+        <li>Em modo <b>Wiki</b>, o token e usado para clonar <code>...wiki.git</code>.</li>
+      </ul>
+      <div class="ok">Tokens e senhas sao mascarados na tela (com botao de "olho" para revelar) e guardados criptografados.</div>
+    </section>
+
+    <section id="wiki-startpoints">
+      <h3>4.3 Start Points (pontos de partida)</h3>
+      <p>Start points limitam quais pastas/arquivos a wiki vai trazer.</p>
+      <ol>
+        <li>No cadastro da wiki, clique em <b>Pages</b>.</li>
+        <li>O app lista a arvore de paginas disponiveis.</li>
+        <li>Marque as pastas/paginas desejadas e confirme.</li>
+      </ol>
+      <ul>
+        <li><b>Sem nenhum start point</b> = a wiki traz <b>tudo</b> dentro do escopo (no GitHub, o repo inteiro quando o Docs Path tambem esta vazio).</li>
+        <li>Selecionar uma <b>pasta</b> traz todas as paginas dentro dela.</li>
+      </ul>
+      <div class="tip">Docs Path e Start Points trabalham juntos: Docs Path restringe a pasta-base; Start Points restringe ainda mais dentro dela.</div>
+    </section>
+
+    <section id="users">
+      <h3>5. Cadastrar Usuarios e Grupos</h3>
+      <h4>Usuario local</h4>
+      <ol>
+        <li>Abra <b>Users and Groups</b>.</li>
+        <li>Clique em <b>Novo Usuario</b> e escolha o tipo <b>Local</b>.</li>
+        <li>Preencha usuario, nome, e-mail (opcional), senha e confirmacao.</li>
+        <li>Clique em <b>Salvar</b>.</li>
+      </ol>
+      <h4>Usuario externo</h4>
+      <ol>
+        <li>Novo usuario e selecione tipo externo (Azure/AD/GitHub).</li>
+        <li>Selecione o provider correspondente.</li>
+        <li>Busque usuarios ativos, escolha um e salve.</li>
+      </ol>
+      <h4>Grupo</h4>
+      <ol>
+        <li>Clique em <b>Novo Grupo</b>, informe nome e descricao.</li>
+        <li>Salve e depois adicione membros.</li>
+      </ol>
+    </section>
+
+    <section id="permissions">
+      <h3>6. Definir Permissoes</h3>
+      <h4>Permissao de sistema</h4>
+      <ol>
+        <li>Abra <b>Permissions</b> e selecione usuario ou grupo.</li>
+        <li>Marque: Administrador, Gerenciar Wikis, Gerenciar Usuarios, Gerenciar Permissoes.</li>
+        <li>Clique em <b>Salvar</b>.</li>
+      </ol>
+      <h4>Permissao por wiki</h4>
+      <ol>
+        <li>Com a politica selecionada, clique <b>Adicionar regra</b>.</li>
+        <li>Escolha a wiki e os start points permitidos.</li>
+        <li>Marque: visualizar, comentar, Word, PDF, papel timbrado.</li>
+        <li>Salve a regra e depois a politica.</li>
+      </ol>
+      <div class="tip">Se o usuario nao enxerga uma wiki, verifique primeiro a regra <code>CanView</code> e os start points.</div>
+    </section>
+
+    <section id="providers">
+      <h3>7. Configurar Providers</h3>
+      <h4>Providers de autenticacao</h4>
+      <ol>
+        <li>Acesse <b>Providers</b> e crie/edite um provider OAuth ou Azure AD.</li>
+        <li>Preencha ClientId, Secret, Redirect e Tenant (quando aplicavel).</li>
+        <li>Ative o provider e salve.</li>
+      </ol>
+      <p class="small">Os provedores OAuth padrao (Azure AD, GitHub, Google, Microsoft) ja vem pre-cadastrados, desabilitados, aguardando credenciais.</p>
+      <h4>Providers de IA</h4>
+      <ol>
+        <li>Crie um novo provider de IA.</li>
+        <li>Preencha endpoint, chave, modelo e versao.</li>
+        <li>Ajuste timeout, temperature e max tokens.</li>
+        <li>Salve e, se necessario, marque como padrao.</li>
+      </ol>
+      <div class="ok">A chave de API de IA e guardada criptografada em repouso.</div>
+    </section>
+
+    <section id="ai">
+      <h3>8. Usar IA no Conteudo</h3>
+      <ol>
+        <li>No Workspace, carregue uma ou mais paginas.</li>
+        <li>Escolha o escopo: pagina atual ou todas as paginas carregadas.</li>
+        <li>Clique em <b>Summary</b>, <b>Index</b> ou <b>Quiz</b>.</li>
+        <li>No modal de resultado, revise em <b>Preview</b>.</li>
+        <li>Clique em <b>Add to preview</b> para incluir como pagina extra.</li>
+      </ol>
+      <div class="warn">Se o botao de IA estiver desabilitado, revise o provider de IA (habilitado + chave + modelo).</div>
+    </section>
+
+    <section id="export">
+      <h3>9. Exportar Word/PDF</h3>
+      <h4>Exportar Word</h4>
+      <ol>
+        <li>Defina o escopo de exportacao.</li>
+        <li>Opcional: incluir paginas de IA e aplicar o ajuste fino do Word.</li>
+        <li>Clique em <b>Export to Word</b> e escolha o local do arquivo.</li>
+      </ol>
+      <h4>Exportar PDF</h4>
+      <ol>
+        <li>Defina o escopo (mesmo fluxo).</li>
+        <li>Clique em <b>Export to PDF</b>.</li>
+      </ol>
+      <table>
+        <thead><tr><th>Opcao</th><th>Quando usar</th></tr></thead>
+        <tbody>
+          <tr><td>Pagina atual</td><td>Documento rapido e pontual</td></tr>
+          <tr><td>Todas as paginas</td><td>Entrega consolidada</td></tr>
+          <tr><td>Incluir paginas de IA</td><td>Quando o resultado gerado deve ir para a entrega final</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="token">
+      <h3>10. Gerar Token de Conexao</h3>
+      <p>O token de conexao empacota os dados de acesso ao banco para configurar outra maquina sem digitar tudo de novo.</p>
+      <ol>
+        <li>Com usuario admin, abra o menu <b>Connection Token</b>.</li>
+        <li>Defina a validade.</li>
+        <li>Clique em gerar e escolha onde salvar o arquivo.</li>
+        <li>Use esse arquivo no onboarding (modo "base existente") da nova maquina.</li>
+      </ol>
+      <div class="warn">O arquivo de token contem dados sensiveis de conexao. Compartilhe apenas por canais seguros.</div>
+    </section>
+
+    <section id="dados">
+      <h3>11. Gerenciar Dados</h3>
+      <p>Tela para exportar, importar e limpar dados de forma seletiva, alem de resetar a instalacao local.</p>
+      <h4>Exportar / Importar <span class="pill">somente admin</span></h4>
+      <ol>
+        <li>Abra <b>Gerenciar Dados</b>.</li>
+        <li>Marque o que deseja: <b>Wikis</b>, <b>Provedores de IA</b> e/ou <b>Provedores OAuth</b>.</li>
+        <li>Clique em <b>Exportar</b> para salvar um arquivo, ou <b>Importar</b> para carregar de um arquivo.</li>
+      </ol>
+      <h4>Limpar dados</h4>
+      <p>Selecione as categorias e confirme para remove-las do banco. Util para refazer um cadastro do zero sem reinstalar.</p>
+      <h4>Reset local</h4>
+      <p>Remove a configuracao local desta maquina (registro + pastas locais) e fecha o app. Use quando precisar desinstalar/limpar completamente o app desta maquina.</p>
+      <div class="warn">A limpeza e o reset sao irreversiveis. Exporte antes se quiser um backup.</div>
+    </section>
+
+    <section id="rotina">
+      <h3>12. Rotina Recomendada de Operacao</h3>
+      <ol>
+        <li>Atualize/valide providers e permissoes (quando houver mudancas).</li>
+        <li>Carregue as paginas no workspace.</li>
+        <li>Aplique IA, se necessario.</li>
+        <li>Revise o preview.</li>
+        <li>Exporte Word/PDF.</li>
+      </ol>
+    </section>
+
+    <section id="erros">
+      <h3>13. Erros Comuns e Solucao</h3>
+      <table>
+        <thead><tr><th>Sintoma</th><th>Causa provavel</th><th>Solucao</th></tr></thead>
+        <tbody>
+          <tr><td>Teste OK mas nenhuma pagina carrega (GitHub)</td><td>Nome do repo/owner incorreto ou branch errada</td><td>Confira Owner, Repository (exato, sem .git) e Branch</td></tr>
+          <tr><td>So aparecem paginas de subpastas, faltam as da raiz</td><td>Docs Path preenchido</td><td>Deixe o Docs Path <b>vazio</b> para trazer o repo inteiro</td></tr>
+          <tr><td>"Cadeia de certificados nao confiavel" (SQL Server)</td><td>Certificado TLS interno/auto-assinado</td><td>Marque "Confiar no certificado do servidor" no setup/edicao</td></tr>
+          <tr><td>Wiki nao aparece no combo</td><td>Sem permissao de visualizacao</td><td>Revisar politica e start points</td></tr>
+          <tr><td>Tree sem paginas</td><td>Conexao invalida ou start point incorreto</td><td>Testar a wiki e reconfigurar Pages</td></tr>
+          <tr><td>Azure login nao abre</td><td>Provider Azure desabilitado</td><td>Ativar em Providers</td></tr>
+          <tr><td>IA desabilitada</td><td>Provider de IA invalido</td><td>Validar endpoint/chave/modelo</td></tr>
+          <tr><td>Conta bloqueada no login</td><td>Muitas tentativas com senha errada</td><td>Aguardar o lockout ou pedir liberacao ao admin</td></tr>
+          <tr><td>Exportacao incompleta</td><td>Escopo errado ou pagina nao carregada</td><td>Conferir escopo e recarregar</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="glossario">
+      <h3>14. Glossario e FAQ</h3>
+      <h4>Glossario</h4>
+      <ul>
+        <li><b>Start point</b>: ponto de partida (pasta/pagina) a partir do qual a wiki e listada.</li>
+        <li><b>Docs Path</b>: pasta-base no repositorio GitHub; vazio = repositorio inteiro.</li>
+        <li><b>Source mode</b>: no GitHub, escolhe entre arquivos do repositorio (Repository) ou a aba Wiki.</li>
+        <li><b>PAT</b>: Personal Access Token, credencial de acesso a API do GitHub/Azure.</li>
+        <li><b>Provider</b>: provedor externo de autenticacao (OAuth/Azure) ou de IA.</li>
+        <li><b>Politica de permissao</b>: conjunto de regras de acesso de um usuario/grupo.</li>
+        <li><b>Token de conexao</b>: arquivo que transporta a configuracao do banco para outra maquina.</li>
+      </ul>
+      <h4>FAQ</h4>
+      <p><b>Posso usar o app sem servidor de banco?</b> Sim, escolha SQLite no setup.</p>
+      <p><b>Preciso de token para repositorio publico?</b> Em modo Repository funciona com token minimo; sem token ha limite de requisicoes.</p>
+      <p><b>Como pego tudo do repositorio?</b> Docs Path vazio + nenhum start point.</p>
+      <p><b>Onde ficam os logs?</b> Em <code>%LocalAppData%\ExportAzureWiki\Logs</code>.</p>
+      <p class="small">Manual atualizado em 14/06/2026.</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

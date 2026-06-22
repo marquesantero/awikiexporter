@@ -1,0 +1,81 @@
+<Window x:Class="ExportAzureWiki.Wpf.Views.Dialogs.WikiRuleEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding DialogTitle}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Width="640"
+        Height="460"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}" Padding="14">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding DialogTitle}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+
+            <TextBlock Grid.Row="1" Text="{Binding WikiIdText}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="1"
+                      Grid.Column="1"
+                      Margin="8,0,0,8"
+                      ItemsSource="{Binding WikiOptions}"
+                      SelectedValuePath="Id"
+                      DisplayMemberPath="DisplayName"
+                      SelectedValue="{Binding WikiId, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Row="2" Text="{Binding StartPointsText}" VerticalAlignment="Center" />
+            <Grid Grid.Row="2" Grid.Column="1" Margin="8,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0"
+                         Height="70"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         IsReadOnly="True"
+                         Text="{Binding StartPoints, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Column="1"
+                        Margin="8,0,0,0"
+                        Width="110"
+                        VerticalAlignment="Top"
+                        Content="{Binding SelectStartPointsText}"
+                        Click="BtnSelectStartPoints_OnClick"
+                        Style="{StaticResource SecondaryActionButtonStyle}" />
+            </Grid>
+
+            <WrapPanel Grid.Row="3" Grid.ColumnSpan="2" Margin="0,6,0,0">
+                <CheckBox Margin="0,0,12,0" Content="{Binding ViewText}" IsChecked="{Binding CanView}" />
+                <CheckBox Margin="0,0,12,0" Content="{Binding CommentText}" IsChecked="{Binding CanComment}" />
+                <CheckBox Margin="0,0,12,0" Content="{Binding WordText}" IsChecked="{Binding CanExportWord}" />
+                <CheckBox Margin="0,0,12,0" Content="{Binding PdfText}" IsChecked="{Binding CanExportPdf}" />
+                <CheckBox Content="{Binding LetterheadText}" IsChecked="{Binding CanUseLetterhead}" />
+            </WrapPanel>
+
+            <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Margin="0,10,0,0" Foreground="#54636C" TextWrapping="Wrap"
+                       Text="{Binding HelpText}" />
+        </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="{Binding CancelText}" Width="120" Margin="0,0,8,0" Click="BtnCancel_OnClick" Style="{StaticResource SecondaryActionButtonStyle}"/>
+            <Button Content="{Binding SaveText}" Width="140" Click="BtnSave_OnClick" Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

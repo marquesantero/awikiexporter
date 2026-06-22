@@ -1,0 +1,56 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+    ignore:
+      # System.CommandLine 2.0.0-beta4 to the 2.0.x GA line is a breaking-API
+      # jump (beta-to-GA redesign): IsRequired, SetHandler, AddCommand and
+      # InvokeAsync were all renamed or removed. ExportAzureWiki.CLI/
+      # Program.cs would need a full rewrite to consume the GA API. The
+      # beta -> GA bump is NOT classified as semver-major, so ALL updates
+      # are ignored here until the CLI is migrated; do not re-open weekly.
+      - dependency-name: "System.CommandLine"
+      # FluentAssertions 7.0+ moved to a commercial (Xceed) license that is
+      # incompatible with this repo's Apache-2.0 license. 6.12.x is the last
+      # MIT-licensed line. Stay on 6.x; do not re-open the major-bump PR.
+      - dependency-name: "FluentAssertions"
+        update-types: ["version-update:semver-major"]
+
+    groups:
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+      microsoft-identity:
+        patterns:
+          - "Microsoft.Identity.*"
+      microsoft-data:
+        patterns:
+          - "Microsoft.Data.*"
+      azure-devops:
+        patterns:
+          - "Microsoft.TeamFoundationServer.*"
+          - "Microsoft.VisualStudio.Services.*"
+          - "Microsoft.Azure.DevOps.*"
+      itext:
+        patterns:
+          - "itext7*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+    labels:
+      - "dependencies"
+      - "github-actions"

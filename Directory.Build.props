@@ -1,0 +1,64 @@
+<Project>
+
+  <!--
+    Repo-wide build defaults. Applied before each csproj loads.
+    Project-specific overrides (TargetFramework, UseWPF, UseWindowsForms,
+    OutputType, etc.) stay in the individual csproj files.
+  -->
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Single source of truth for the product version. The MSIX packaging
+      script reads this (via `dotnet msbuild -getProperty:Version`) and maps
+      it onto the 4-part Package/Identity version. Bump here for a release;
+      the git tag (vX.Y.Z) should match.
+    -->
+    <Version>1.1.0</Version>
+    <Product>ExportAzureWiki</Product>
+    <Company>Ti com Café</Company>
+
+    <!-- Reproducible builds. PDBs are deterministic; embed sources only in CI. -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <!--
+      Built-in .NET analyzers. "Recommended" is the sane default; tightened to
+      "All" later (Fase 1+) once existing warnings are triaged. Code style is
+      enforced during build so unused usings, naming conventions, etc. surface
+      in CI output, not just in the IDE.
+    -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!--
+      Don't fail the build on analyzer warnings yet; legacy code has known
+      issues that Fase 1/2 will address. Track but don't block.
+    -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!--
+      Generate documentation file for public APIs so XML doc warnings surface,
+      but suppress CS1591 (missing XML doc) globally since we're not there yet.
+    -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    NuGet audit suppressions for transitive advisories that have no patched
+    version available yet. Kept in sync with the allowlist in the CI
+    "List vulnerable packages" step. Revisit and remove when upstream ships a fix.
+      GHSA-2m69-gcr7-jv3q  SQLitePCLRaw.lib.e_sqlite3 (transitive via
+        Microsoft.Data.Sqlite): bundles a vulnerable SQLite; firstPatchedVersion
+        is null, so no version bump can resolve it.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
+
+</Project>

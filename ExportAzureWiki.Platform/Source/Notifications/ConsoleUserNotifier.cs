@@ -22,7 +22,7 @@ public sealed class ConsoleUserNotifier : IUserNotifier
         Console.Error.WriteLine($"[WARN]  {title}: {message}");
     }
 
-    public void Error(string message, string title)
+    public void ShowError(string message, string title)
     {
         Console.Error.WriteLine($"[ERROR] {title}: {message}");
     }

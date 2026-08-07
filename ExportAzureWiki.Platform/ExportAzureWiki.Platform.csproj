@@ -61,7 +61,9 @@
     past the vulnerable version.
   -->
   <ItemGroup>
+    <PackageReference Include="AngleSharp" />
     <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
     <PackageReference Include="System.Data.SqlClient" />
     <PackageReference Include="System.Drawing.Common" />
     <PackageReference Include="System.IO.Packaging" />

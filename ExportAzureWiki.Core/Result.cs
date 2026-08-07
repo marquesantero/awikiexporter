@@ -7,7 +7,7 @@ public class Result<T>
     public string? Error { get; }
     public Exception? Exception { get; }
 
-    private Result(bool isSuccess, T? value, string? error, Exception? exception = null)
+    internal Result(bool isSuccess, T? value, string? error, Exception? exception = null)
     {
         IsSuccess = isSuccess;
         Value = value;
@@ -15,41 +15,34 @@ public class Result<T>
         Exception = exception;
     }
 
-    public static Result<T> Success(T value) => new(true, value, null);
-
-    public static Result<T> Failure(string error) => new(false, default, error);
-
-    public static Result<T> Failure(Exception exception) =>
-        new(false, default, exception.Message, exception);
-
     public Result<TNew> Map<TNew>(Func<T, TNew> mapper)
     {
         if (!IsSuccess)
-            return Result<TNew>.Failure(Error ?? "Unknown error");
+            return Result.Failure<TNew>(Error ?? "Unknown error");
 
         try
         {
-            return Result<TNew>.Success(mapper(Value!));
+            return Result.Success(mapper(Value!));
         }
         catch (Exception ex)
         {
-            return Result<TNew>.Failure(ex);
+            return Result.Failure<TNew>(ex);
         }
     }
 
     public async Task<Result<TNew>> MapAsync<TNew>(Func<T, Task<TNew>> mapper)
     {
         if (!IsSuccess)
-            return Result<TNew>.Failure(Error ?? "Unknown error");
+            return Result.Failure<TNew>(Error ?? "Unknown error");
 
         try
         {
             var result = await mapper(Value!);
-            return Result<TNew>.Success(result);
+            return Result.Success(result);
         }
         catch (Exception ex)
         {
-            return Result<TNew>.Failure(ex);
+            return Result.Failure<TNew>(ex);
         }
     }
 }
@@ -73,4 +66,11 @@ public class Result
 
     public static Result Failure(Exception exception) =>
         new(false, exception.Message, exception);
+
+    public static Result<T> Success<T>(T value) => new(true, value, null);
+
+    public static Result<T> Failure<T>(string error) => new(false, default, error);
+
+    public static Result<T> Failure<T>(Exception exception) =>
+        new(false, default, exception.Message, exception);
 }

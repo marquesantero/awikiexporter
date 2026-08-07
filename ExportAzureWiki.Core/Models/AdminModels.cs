@@ -90,7 +90,7 @@ public sealed class AuthenticationConfiguration
     public bool SyncAzureADGroups { get; set; }
     public bool SyncWindowsGroups { get; set; }
     public string? AzureADTenantId { get; set; }
-    public bool AutoCreateUsers { get; set; } = false;
+    public bool AutoCreateUsers { get; set; }
     public string DefaultRole { get; set; } = "User";
     public bool UseLocalPermissions { get; set; } = true;
     public bool UseAzureADPermissions { get; set; }

@@ -180,6 +180,7 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
     public string LocalTabText => AppText.S("wpf.workspace.tab.local", "Local");
     public string LocalEmptyHintText => AppText.S("wpf.workspace.local.empty_hint", "Open a file or folder to list Markdown here.");
     public string SearchPlaceholderText => AppText.S("wpf.workspace.search.placeholder", "Filter pages...");
+    public string BusyTitleText => AppText.S("wpf.workspace.busy.title", "Processing");
 
     private string _onlineFilterText = string.Empty;
     public string OnlineFilterText
@@ -635,6 +636,22 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(IsBusy));
         OnPropertyChanged(nameof(ShowBusyFeedback));
+    }
+
+    private void SetExportPhase(string message)
+    {
+        IsExporting = true;
+        BusyMessage = message;
+        Status = message;
+    }
+
+    private void ClearExportPhase()
+    {
+        if (QueuedExportCount == 0)
+        {
+            IsExporting = false;
+            BusyMessage = string.Empty;
+        }
     }
 
     public void SetAiProviderAvailability(bool available)

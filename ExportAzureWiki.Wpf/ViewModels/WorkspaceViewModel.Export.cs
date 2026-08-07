@@ -12,6 +12,7 @@ using Markdig;
 using HtmlAgilityPack;
 using Microsoft.Win32;
 using ExportAzureWiki;
+using ExportAzureWiki.Services;
 
 namespace ExportAzureWiki.Wpf.ViewModels;
 
@@ -64,8 +65,8 @@ public sealed partial class WorkspaceViewModel
     /// <summary>
     /// Replaces every Mermaid block in the export HTML with a locally rendered
     /// PNG (via <see cref="MermaidRenderHandler"/>), so Word/PDF export never
-    /// reaches mermaid.ink. Blocks that fail to render fall back to a plain code
-    /// block. No-op when no handler is available.
+    /// reaches mermaid.ink. Blocks that fail to render stay as Mermaid blocks so
+    /// the backend Chromium export pipeline can still render them.
     /// </summary>
     private async Task<string> PrerenderMermaidAsync(string html)
     {
@@ -119,18 +120,23 @@ public sealed partial class WorkspaceViewModel
             return html;
         }
 
+        LoggingService.LogInfo($"WPF_MERMAID_PRERENDER_START: count={targets.Count}");
         var tempDir = Path.Combine(Path.GetTempPath(), "AWikiMermaid");
         Directory.CreateDirectory(tempDir);
 
-        foreach (var (node, source) in targets)
+        var renderedCount = 0;
+        var fallbackCount = 0;
+        for (var i = 0; i < targets.Count; i++)
         {
+            var (node, source) = targets[i];
             byte[]? png = null;
             try
             {
-                png = await MermaidRenderHandler(source);
+                png = await TryRenderMermaidWithTimeoutAsync(source, i + 1, targets.Count);
             }
-            catch
+            catch (Exception ex)
             {
+                LoggingService.LogWarning($"WPF_MERMAID_PRERENDER_FAILED: index={i + 1}; error={ex.Message}");
                 png = null;
             }
 
@@ -142,19 +148,40 @@ public sealed partial class WorkspaceViewModel
                 img.SetAttributeValue("src", new Uri(file).AbsoluteUri);
                 img.SetAttributeValue("alt", "Mermaid diagram");
                 node.ParentNode.ReplaceChild(img, node);
+                renderedCount++;
             }
             else
             {
-                // No external fallback: keep the diagram source as a code block.
-                var pre = doc.CreateElement("pre");
-                var code = doc.CreateElement("code");
-                code.InnerHtml = System.Net.WebUtility.HtmlEncode(source);
-                pre.AppendChild(code);
-                node.ParentNode.ReplaceChild(pre, node);
+                var div = doc.CreateElement("div");
+                div.SetAttributeValue("class", "mermaid");
+                div.SetAttributeValue("data-mermaid-source", System.Net.WebUtility.HtmlEncode(source));
+                div.InnerHtml = System.Net.WebUtility.HtmlEncode(source);
+                node.ParentNode.ReplaceChild(div, node);
+                fallbackCount++;
             }
         }
 
+        LoggingService.LogInfo($"WPF_MERMAID_PRERENDER_DONE: rendered={renderedCount}; fallback={fallbackCount}");
         return doc.DocumentNode.OuterHtml;
+    }
+
+    private async Task<byte[]?> TryRenderMermaidWithTimeoutAsync(string source, int index, int total)
+    {
+        if (MermaidRenderHandler == null)
+        {
+            return null;
+        }
+
+        var renderTask = MermaidRenderHandler(source);
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
+        var completed = await Task.WhenAny(renderTask, timeoutTask);
+        if (completed == timeoutTask)
+        {
+            LoggingService.LogWarning($"WPF_MERMAID_PRERENDER_TIMEOUT: index={index}; total={total}");
+            return null;
+        }
+
+        return await renderTask;
     }
 
     private Task<string> BuildAllLoadedPagesHtmlAsync()
@@ -260,76 +287,123 @@ public sealed partial class WorkspaceViewModel
 
     private async Task ExportWordAsync()
     {
-        var html = await BuildExportHtmlAsync(IncludeAdditionalPages, SelectedScope, RefreshCacheBeforeExport);
-        if (string.IsNullOrWhiteSpace(html))
+        try
         {
-            Status = AppText.S("wpf.export.status.no_content", "No page selected/content loaded.");
-            return;
+            SetExportPhase(AppText.S("wpf.export.status.preparing_word", "Preparing Word export..."));
+            LoggingService.LogInfo($"WPF_WORD_EXPORT_PREPARE: scope={SelectedScope}; renderedPages={_renderedPages.Count}; currentIndex={_currentRenderedPageIndex}; hasCurrentHtml={!string.IsNullOrWhiteSpace(CurrentPageHtml)}");
+
+            var html = await BuildExportHtmlAsync(IncludeAdditionalPages, SelectedScope, RefreshCacheBeforeExport);
+            if (string.IsNullOrWhiteSpace(html))
+            {
+                Status = AppText.S("wpf.export.status.no_content", "No page selected/content loaded.");
+                LoggingService.LogWarning("WPF_WORD_EXPORT_NO_CONTENT");
+                ClearExportPhase();
+                return;
+            }
+
+            var dialog = new SaveFileDialog
+            {
+                Filter = AppText.S("wpf.export.dialog.word.filter", "Word (*.docx)|*.docx"),
+                FileName = BuildDefaultExportFileName("docx")
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                Status = AppText.S("wpf.export.status.canceled", "Export canceled.");
+                LoggingService.LogInfo("WPF_WORD_EXPORT_CANCELED");
+                ClearExportPhase();
+                return;
+            }
+
+            await QueueExportAsync(
+                format: "word",
+                outputPath: dialog.FileName,
+                html: html,
+                successStatusFormat: AppText.S("wpf.export.status.word_success", "Word exported: {0}"),
+                busyText: AppText.S("wpf.workspace.busy.exporting_word", "Rendering content and exporting Word..."),
+                exportOperation: () => _documentExportService.ExportToWordAsync(html, dialog.FileName, ApplyWordFineTune && SelectedScope == ExportScope.CurrentDocument, RefreshCacheBeforeExport));
         }
-
-        html = await PrerenderMermaidAsync(html);
-
-        var dialog = new SaveFileDialog
+        catch (Exception ex)
         {
-            Filter = AppText.S("wpf.export.dialog.word.filter", "Word (*.docx)|*.docx"),
-            FileName = AppText.S("wpf.export.dialog.word.filename", "wiki-export.docx")
-        };
-
-        if (dialog.ShowDialog() != true)
-        {
-            return;
+            Status = string.Format(AppText.S("wpf.export.status.error", "Error: {0}"), ex.Message);
+            LoggingService.LogError($"WPF_WORD_EXPORT_PRE_QUEUE_ERROR: {ex}");
+            ClearExportPhase();
         }
-
-        await QueueExportAsync(
-            format: "word",
-            outputPath: dialog.FileName,
-            html: html,
-            successStatusFormat: AppText.S("wpf.export.status.word_success", "Word exported: {0}"),
-            busyText: AppText.S("wpf.workspace.busy.exporting_word", "Exporting Word..."),
-            exportOperation: () => _documentExportService.ExportToWordAsync(html, dialog.FileName, ApplyWordFineTune && SelectedScope == ExportScope.CurrentDocument, RefreshCacheBeforeExport));
     }
 
     private async Task ExportPdfAsync()
     {
-        var html = await BuildExportHtmlAsync(IncludeAdditionalPages, SelectedScope, RefreshCacheBeforeExport);
-        if (string.IsNullOrWhiteSpace(html))
+        try
         {
-            Status = AppText.S("wpf.export.status.no_content", "No page selected/content loaded.");
-            return;
-        }
+            SetExportPhase(AppText.S("wpf.export.status.preparing_pdf", "Preparing PDF export..."));
+            LoggingService.LogInfo($"WPF_PDF_EXPORT_PREPARE: scope={SelectedScope}; renderedPages={_renderedPages.Count}; currentIndex={_currentRenderedPageIndex}; hasCurrentHtml={!string.IsNullOrWhiteSpace(CurrentPageHtml)}");
 
-        html = await PrerenderMermaidAsync(html);
-
-        var dialog = new SaveFileDialog
-        {
-            Filter = AppText.S("wpf.export.dialog.pdf.filter", "PDF (*.pdf)|*.pdf"),
-            FileName = AppText.S("wpf.export.dialog.pdf.filename", "wiki-export.pdf")
-        };
-
-        if (dialog.ShowDialog() != true)
-        {
-            return;
-        }
-
-        await QueueExportAsync(
-            format: "pdf",
-            outputPath: dialog.FileName,
-            html: html,
-            successStatusFormat: AppText.S("wpf.export.status.pdf_success", "PDF exported: {0}"),
-            busyText: AppText.S("wpf.workspace.busy.exporting_pdf", "Exporting PDF..."),
-            exportOperation: async () =>
+            var html = await BuildExportHtmlAsync(IncludeAdditionalPages, SelectedScope, RefreshCacheBeforeExport);
+            if (string.IsNullOrWhiteSpace(html))
             {
-                var exported = false;
-                if (PdfPrintHandlerAsync != null)
-                {
-                    exported = await PdfPrintHandlerAsync(html, dialog.FileName);
-                }
+                Status = AppText.S("wpf.export.status.no_content", "No page selected/content loaded.");
+                LoggingService.LogWarning("WPF_PDF_EXPORT_NO_CONTENT");
+                ClearExportPhase();
+                return;
+            }
 
-                if (!exported)
+            var dialog = new SaveFileDialog
+            {
+                Filter = AppText.S("wpf.export.dialog.pdf.filter", "PDF (*.pdf)|*.pdf"),
+                FileName = BuildDefaultExportFileName("pdf")
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                Status = AppText.S("wpf.export.status.canceled", "Export canceled.");
+                LoggingService.LogInfo("WPF_PDF_EXPORT_CANCELED");
+                ClearExportPhase();
+                return;
+            }
+
+            await QueueExportAsync(
+                format: "pdf",
+                outputPath: dialog.FileName,
+                html: html,
+                successStatusFormat: AppText.S("wpf.export.status.pdf_success", "PDF exported: {0}"),
+                busyText: AppText.S("wpf.workspace.busy.exporting_pdf", "Rendering content and exporting PDF..."),
+                exportOperation: async () =>
                 {
                     await _documentExportService.ExportToPdfAsync(html, dialog.FileName);
-                }
-            });
+                });
+        }
+        catch (Exception ex)
+        {
+            Status = string.Format(AppText.S("wpf.export.status.error", "Error: {0}"), ex.Message);
+            LoggingService.LogError($"WPF_PDF_EXPORT_PRE_QUEUE_ERROR: {ex}");
+            ClearExportPhase();
+        }
+    }
+
+    private string BuildDefaultExportFileName(string extension)
+    {
+        var source = !string.IsNullOrWhiteSpace(CurrentDocumentTitle)
+            ? CurrentDocumentTitle
+            : AppText.S("wpf.export.dialog.default_basename", "wiki-export");
+
+        var name = Path.GetFileNameWithoutExtension(source.Replace('\\', '/').Split('/').LastOrDefault() ?? source);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "wiki-export";
+        }
+
+        foreach (var invalid in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(invalid, '_');
+        }
+
+        name = name.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            name = "wiki-export";
+        }
+
+        return $"{name}.{extension.TrimStart('.')}";
     }
 
     private async Task QueueExportAsync(
@@ -359,17 +433,20 @@ public sealed partial class WorkspaceViewModel
             IsExporting = true;
             BusyMessage = busyText;
             Status = busyText;
+            LoggingService.LogInfo($"WPF_EXPORT_START: format={format}; scope={SelectedScope}; output='{outputPath}'; htmlLength={html.Length}");
             // Flows into the export's async chain (and its Task.Run): when on,
             // remote images come only from cache and nothing hits the network.
             ExportRuntimeOptions.OfflineImagesOnly = OfflineExport;
             await exportOperation();
             success = true;
             Status = string.Format(successStatusFormat, outputPath);
+            LoggingService.LogInfo($"WPF_EXPORT_SUCCESS: format={format}; output='{outputPath}'; elapsedMs={stopwatch.ElapsedMilliseconds}");
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
             Status = string.Format(AppText.S("wpf.export.status.error", "Error: {0}"), ex.Message);
+            LoggingService.LogError($"WPF_EXPORT_ERROR: format={format}; output='{outputPath}'; error={ex}");
         }
         finally
         {

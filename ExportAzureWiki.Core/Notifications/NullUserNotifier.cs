@@ -13,6 +13,6 @@ public sealed class NullUserNotifier : IUserNotifier
 
     public void Info(string message, string title) { }
     public void Warn(string message, string title) { }
-    public void Error(string message, string title) { }
+    public void ShowError(string message, string title) { }
     public ConfirmResult Confirm(string message, string title, bool allowCancel = false) => ConfirmResult.No;
 }

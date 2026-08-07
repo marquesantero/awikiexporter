@@ -12,9 +12,9 @@ namespace ExportAzureWiki.Data.Repositories;
 /// <typeparam name="T">Entity type</typeparam>
 public abstract class BaseRepository<T> : IRepository<T> where T : class
 {
-    protected readonly IDbConnection Connection;
-    protected readonly DatabaseType DatabaseType;
-    protected readonly string TableName;
+    protected IDbConnection Connection { get; }
+    protected DatabaseType DatabaseType { get; }
+    protected string TableName { get; }
     private HashSet<string>? _tableColumnsCache;
 
     protected BaseRepository(IDbConnection connection, DatabaseType databaseType, string tableName)

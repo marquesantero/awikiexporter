@@ -174,7 +174,12 @@ namespace ExportAzureWiki
 
         public async Task<string> GetPageContentAsync(string? path)
         {
-            var wikis = await (_wikiClient?.GetAllWikisAsync()).ConfigureAwait(false)!;
+            if (_wikiClient == null)
+            {
+                throw new InvalidOperationException(LocalizationManager.S("azdo.error.wiki_client_not_initialized"));
+            }
+
+            var wikis = await _wikiClient.GetAllWikisAsync().ConfigureAwait(false);
             var wiki = wikis.FirstOrDefault(w => w.Name == _config?.WikiName);
 
             if (wiki == null)
@@ -415,4 +420,3 @@ namespace ExportAzureWiki
         }
     }
 }
-

@@ -16,7 +16,7 @@ public sealed class WpfUserNotifier : IUserNotifier
     public void Warn(string message, string title)
         => MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
 
-    public void Error(string message, string title)
+    public void ShowError(string message, string title)
         => MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
     public ConfirmResult Confirm(string message, string title, bool allowCancel = false)

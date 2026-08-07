@@ -1,9 +1,11 @@
+using System.Globalization;
+
 namespace ExportAzureWiki.Core.Localization;
 
 public static class AppText
 {
     private static Func<string, string?, string> _translate = static (key, fallback) => fallback ?? key;
-    private static Func<string, object[], string> _format = static (template, args) => string.Format(template, args);
+    private static Func<string, object[], string> _format = static (template, args) => string.Format(CultureInfo.CurrentCulture, template, args);
 
     public static void Configure(
         Func<string, string?, string> translate,

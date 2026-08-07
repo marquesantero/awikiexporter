@@ -25,6 +25,6 @@ public interface IUserNotifier
 {
     void Info(string message, string title);
     void Warn(string message, string title);
-    void Error(string message, string title);
+    void ShowError(string message, string title);
     ConfirmResult Confirm(string message, string title, bool allowCancel = false);
 }

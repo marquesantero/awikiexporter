@@ -18,7 +18,7 @@ public static class LocalizedMessageBox
         => UserNotifier.Active.Warn(Localize(text), Localize(caption));
 
     public static void ShowError(string text, string caption)
-        => UserNotifier.Active.Error(Localize(text), Localize(caption));
+        => UserNotifier.Active.ShowError(Localize(text), Localize(caption));
 
     public static ConfirmResult ShowConfirm(string text, string caption, bool allowCancel = false)
         => UserNotifier.Active.Confirm(Localize(text), Localize(caption), allowCancel);

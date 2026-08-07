@@ -1111,6 +1111,11 @@ namespace ExportAzureWiki
             try
             {
                 var ext = Path.GetExtension(imagePath).ToLowerInvariant();
+                if (ext == ".png")
+                {
+                    return EnsurePngHasOpaqueWhiteBackground(imagePath);
+                }
+
                 if (ext is not (".svg" or ".webp"))
                 {
                     return imagePath;
@@ -1119,7 +1124,7 @@ namespace ExportAzureWiki
                 var pngPath = Path.ChangeExtension(imagePath, ".png");
                 if (File.Exists(pngPath))
                 {
-                    return pngPath;
+                    return EnsurePngHasOpaqueWhiteBackground(pngPath);
                 }
 
                 var png = ext == ".svg"
@@ -1131,12 +1136,78 @@ namespace ExportAzureWiki
                 }
 
                 File.WriteAllBytes(pngPath, png);
-                return pngPath;
+                return EnsurePngHasOpaqueWhiteBackground(pngPath);
             }
             catch
             {
                 return imagePath;
             }
+        }
+
+        private static string EnsurePngHasOpaqueWhiteBackground(string imagePath)
+        {
+            try
+            {
+                if (!File.Exists(imagePath) ||
+                    !Path.GetExtension(imagePath).Equals(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    return imagePath;
+                }
+
+                using var source = new System.Drawing.Bitmap(imagePath);
+                if (!HasTransparentPixels(source))
+                {
+                    return imagePath;
+                }
+
+                var outputPath = Path.Combine(
+                    Path.GetDirectoryName(imagePath) ?? string.Empty,
+                    $"{Path.GetFileNameWithoutExtension(imagePath)}.white.png");
+                if (File.Exists(outputPath) &&
+                    File.GetLastWriteTimeUtc(outputPath) >= File.GetLastWriteTimeUtc(imagePath))
+                {
+                    return outputPath;
+                }
+
+                using var flattened = new System.Drawing.Bitmap(
+                    source.Width,
+                    source.Height,
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                using (var graphics = System.Drawing.Graphics.FromImage(flattened))
+                {
+                    graphics.Clear(System.Drawing.Color.White);
+                    graphics.DrawImage(source, 0, 0, source.Width, source.Height);
+                }
+
+                flattened.Save(outputPath, System.Drawing.Imaging.ImageFormat.Png);
+                return outputPath;
+            }
+            catch (Exception ex)
+            {
+                LoggingService.LogWarning($"Word image pipeline: failed to flatten transparent PNG '{imagePath}'.", ex);
+                return imagePath;
+            }
+        }
+
+        private static bool HasTransparentPixels(System.Drawing.Bitmap bitmap)
+        {
+            if (!System.Drawing.Image.IsAlphaPixelFormat(bitmap.PixelFormat))
+            {
+                return false;
+            }
+
+            for (var y = 0; y < bitmap.Height; y++)
+            {
+                for (var x = 0; x < bitmap.Width; x++)
+                {
+                    if (bitmap.GetPixel(x, y).A < 255)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static double? TryGetRequestedImageSizePx(HtmlNode? imgNode, string dimension, double pageMaxWidthPx)

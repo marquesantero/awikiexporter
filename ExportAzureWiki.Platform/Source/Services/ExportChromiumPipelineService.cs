@@ -208,6 +208,7 @@ public static class ExportChromiumPipelineService
         {
             await using var lease = await CreatePageLeaseAsync(html, TimeSpan.FromSeconds(60));
             await InjectLocalHighlightJsAsync(lease.Page);
+            await InjectLocalMermaidAsync(lease.Page);
             await EnsureMathJaxAvailableAsync(lease.Page);
 
             const string script = """
@@ -256,43 +257,55 @@ public static class ExportChromiumPipelineService
                                           }
                                       };
 
-                                      const toPngDataUrl = (svg) => new Promise((resolve) => {
-                                          try {
-                                              const xml = new XMLSerializer().serializeToString(svg);
-                                              const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
-                                              const url = URL.createObjectURL(blob);
-                                              const img = new Image();
-                                              img.onload = () => {
-                                                  try {
-                                                      const w = Math.max(1, Math.ceil(svg.getBoundingClientRect().width || svg.clientWidth || 1200));
-                                                      const h = Math.max(1, Math.ceil(svg.getBoundingClientRect().height || svg.clientHeight || 600));
-                                                      const canvas = document.createElement('canvas');
-                                                      canvas.width = w;
-                                                      canvas.height = h;
-                                                      const ctx = canvas.getContext('2d');
-                                                      if (!ctx) {
-                                                          resolve(null);
-                                                          return;
-                                                      }
-                                                      ctx.fillStyle = '#ffffff';
-                                                      ctx.fillRect(0, 0, w, h);
-                                                      ctx.drawImage(img, 0, 0, w, h);
-                                                      resolve(canvas.toDataURL('image/png'));
-                                                  } catch (_) {
-                                                      resolve(null);
-                                                  } finally {
-                                                      URL.revokeObjectURL(url);
-                                                  }
-                                              };
-                                              img.onerror = () => {
-                                                  URL.revokeObjectURL(url);
-                                                  resolve(null);
-                                              };
-                                              img.src = url;
-                                          } catch (_) {
-                                              resolve(null);
+                                          const normalizeMermaidSvgForExport = (svg) => {
+                                              if (!svg) return;
+
+                                              svg.style.background = '#ffffff';
+                                              svg.setAttribute('style', `${svg.getAttribute('style') || ''};background:#ffffff;color:#111827;`);
+
+                                          const setSvgStyle = (element, property, value) => {
+                                              element.style.setProperty(property, value, 'important');
+                                              element.setAttribute(property, value);
+                                          };
+
+                                          const setFillAndStroke = (selector, fill, stroke) => {
+                                              for (const element of svg.querySelectorAll(selector)) {
+                                                  setSvgStyle(element, 'fill', fill);
+                                                  setSvgStyle(element, 'stroke', stroke);
+                                                  element.style.setProperty('color', '#111827', 'important');
+                                              }
+                                          };
+
+                                          setFillAndStroke(
+                                              '.node rect, .node polygon, .node circle, .node ellipse, .node path, .flowchart-label rect, .cluster rect, .statediagram-state rect, .stateGroup rect, .state rect',
+                                              '#EEF2FF',
+                                              '#7C8DB5');
+
+                                          setFillAndStroke(
+                                              'rect.actor, rect.actor-top, rect.actor-bottom, .actor-box, .labelBox, .activation0, .activation1, .activation2',
+                                              '#EEF2FF',
+                                              '#7C8DB5');
+
+                                          for (const element of svg.querySelectorAll('text, tspan, .label, .nodeLabel, .edgeLabel, .messageText, text.actor, text.actor-box, text.actor-man, .stateLabel, .labelText, .loopText, .noteText')) {
+                                              setSvgStyle(element, 'fill', '#111827');
+                                              element.style.setProperty('color', '#111827', 'important');
                                           }
-                                      });
+
+                                          for (const element of svg.querySelectorAll('.edgePath path, .flowchart-link, .transition, line, path.path, path.relation, .messageLine0, .messageLine1')) {
+                                              setSvgStyle(element, 'stroke', '#374151');
+                                              setSvgStyle(element, 'fill', 'none');
+                                          }
+
+                                          for (const element of svg.querySelectorAll('marker path, marker polygon')) {
+                                              setSvgStyle(element, 'stroke', '#374151');
+                                              setSvgStyle(element, 'fill', '#374151');
+                                          }
+
+                                          for (const element of svg.querySelectorAll('.edgeLabel rect, .labelBkg')) {
+                                              setSvgStyle(element, 'fill', '#ffffff');
+                                              setSvgStyle(element, 'stroke', '#ffffff');
+                                          }
+                                      };
 
                                       const fetchImageAsDataUrl = async (url) => {
                                           try {
@@ -396,9 +409,44 @@ public static class ExportChromiumPipelineService
                                               if (typeof window.mermaid.initialize === 'function') {
                                                   window.mermaid.initialize({
                                                       startOnLoad: false,
-                                                      theme: 'default',
+                                                      theme: 'base',
                                                       securityLevel: 'loose',
-                                                      flowchart: { htmlLabels: true }
+                                                      flowchart: { htmlLabels: false },
+                                                      themeVariables: {
+                                                          background: '#ffffff',
+                                                          primaryColor: '#EEF2FF',
+                                                          primaryBorderColor: '#7C8DB5',
+                                                          primaryTextColor: '#111827',
+                                                          secondaryColor: '#F8FAFC',
+                                                          secondaryBorderColor: '#CBD5E1',
+                                                          secondaryTextColor: '#111827',
+                                                          tertiaryColor: '#FFFFFF',
+                                                          tertiaryBorderColor: '#CBD5E1',
+                                                          tertiaryTextColor: '#111827',
+                                                          textColor: '#111827',
+                                                          lineColor: '#374151',
+                                                          nodeBkg: '#EEF2FF',
+                                                          mainBkg: '#EEF2FF',
+                                                          nodeBorder: '#7C8DB5',
+                                                          nodeTextColor: '#111827',
+                                                          clusterBkg: '#F8FAFC',
+                                                          clusterBorder: '#CBD5E1',
+                                                          edgeLabelBackground: '#FFFFFF',
+                                                          actorBkg: '#EEF2FF',
+                                                          actorBorder: '#7C8DB5',
+                                                          actorTextColor: '#111827',
+                                                          actorLineColor: '#374151',
+                                                          signalColor: '#374151',
+                                                          signalTextColor: '#111827',
+                                                          labelBoxBkgColor: '#EEF2FF',
+                                                          labelBoxBorderColor: '#7C8DB5',
+                                                          labelTextColor: '#111827',
+                                                          loopTextColor: '#111827',
+                                                          activationBkgColor: '#F8FAFC',
+                                                          activationBorderColor: '#94A3B8',
+                                                          sequenceNumberColor: '#111827',
+                                                          fontFamily: 'Arial, sans-serif'
+                                                      }
                                                   });
                                               }
                                               const nodes = Array.from(document.querySelectorAll('.mermaid'));
@@ -416,14 +464,8 @@ public static class ExportChromiumPipelineService
                                           const node = mermaids[i];
                                           const svg = node.querySelector('svg');
                                           if (!svg) continue;
-                                          const png = await toPngDataUrl(svg);
-                                          if (!png) continue;
-                                          const img = document.createElement('img');
-                                          img.src = png;
-                                          img.alt = 'Mermaid diagram';
-                                          img.style.maxWidth = '100%';
-                                          img.style.height = 'auto';
-                                          node.replaceWith(img);
+                                          normalizeMermaidSvgForExport(svg);
+                                          node.setAttribute('data-awiki-mermaid-rendered', '1');
                                       }
 
                                       await inlineExternalImages();
@@ -442,6 +484,8 @@ public static class ExportChromiumPipelineService
                                   """;
 
             var processed = await lease.Page.EvaluateAsync<string>(script);
+            await ReplaceRenderedMermaidsWithScreenshotsAsync(lease.Page).ConfigureAwait(false);
+            processed = await lease.Page.EvaluateAsync<string>("() => document.documentElement.outerHTML");
             return string.IsNullOrWhiteSpace(processed) ? html : processed;
         }
         catch (Exception ex)
@@ -471,6 +515,73 @@ public static class ExportChromiumPipelineService
         catch (Exception ex)
         {
             LoggingService.LogWarning("Chromium pipeline: failed to inject local highlight.js.", ex);
+        }
+    }
+
+    private static async Task InjectLocalMermaidAsync(IPage page)
+    {
+        var localScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "style", "vendor", "mermaid", "mermaid.min.js");
+        if (!File.Exists(localScriptPath))
+        {
+            LoggingService.LogWarning($"Chromium pipeline: local mermaid.js not found at '{localScriptPath}'.");
+            return;
+        }
+
+        try
+        {
+            await page.AddScriptTagAsync(new PageAddScriptTagOptions { Path = localScriptPath });
+        }
+        catch (Exception ex)
+        {
+            LoggingService.LogWarning("Chromium pipeline: failed to inject local mermaid.js.", ex);
+        }
+    }
+
+    private static async Task ReplaceRenderedMermaidsWithScreenshotsAsync(IPage page)
+    {
+        try
+        {
+            var mermaids = await page.QuerySelectorAllAsync(".mermaid[data-awiki-mermaid-rendered='1']");
+            for (var i = 0; i < mermaids.Count; i++)
+            {
+                var mermaid = mermaids[i];
+                try
+                {
+                    var screenshotTarget = await mermaid.QuerySelectorAsync("svg").ConfigureAwait(false) ?? mermaid;
+                    await screenshotTarget.ScrollIntoViewIfNeededAsync().ConfigureAwait(false);
+                    var bytes = await screenshotTarget.ScreenshotAsync(new ElementHandleScreenshotOptions
+                    {
+                        Type = ScreenshotType.Png,
+                        OmitBackground = false,
+                        Timeout = 15000
+                    }).ConfigureAwait(false);
+
+                    if (bytes.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    var dataUrl = $"data:image/png;base64,{Convert.ToBase64String(bytes)}";
+                    await mermaid.EvaluateAsync(
+                        @"(node, src) => {
+                            const img = document.createElement('img');
+                            img.src = src;
+                            img.alt = 'Mermaid diagram';
+                            img.style.maxWidth = '100%';
+                            img.style.height = 'auto';
+                            node.replaceWith(img);
+                        }",
+                        dataUrl).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogWarning($"Chromium pipeline: failed to screenshot Mermaid diagram #{i + 1}.", ex);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            LoggingService.LogWarning("Chromium pipeline: failed to replace Mermaid diagrams with screenshots.", ex);
         }
     }
 

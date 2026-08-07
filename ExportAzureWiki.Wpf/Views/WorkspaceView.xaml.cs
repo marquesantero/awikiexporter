@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,7 @@ using Microsoft.Web.WebView2.Wpf;
 using ExportAzureWiki.Wpf.ViewModels;
 using ExportAzureWiki.Wpf.Views.Dialogs;
 using ExportAzureWiki;
+using ExportAzureWiki.Services;
 
 namespace ExportAzureWiki.Wpf.Views;
 
@@ -88,8 +90,8 @@ public partial class WorkspaceView : UserControl
     /// <summary>
     /// Renders a single Mermaid diagram locally (no mermaid.ink) using an
     /// offscreen WebView2 with the bundled mermaid script, and returns a PNG of
-    /// the rendered SVG via CapturePreview. Returns null on failure so the
-    /// caller falls back to a plain code block.
+    /// the rendered SVG via Chromium screenshot capture. Returns null on failure
+    /// so the backend export pipeline can try its own Mermaid pass.
     /// </summary>
     private async Task<byte[]?> RenderMermaidToPngAsync(string source)
     {
@@ -131,7 +133,7 @@ public partial class WorkspaceView : UserControl
                 </script></body></html>
                 """.Replace("__MERMAID_SRC__", encoded);
 
-            await NavigateAndWaitAsync(wbMermaidHost, html);
+            await NavigateAndWaitAsync(wbMermaidHost, html, timeoutMs: 8000);
 
             for (var i = 0; i < 160; i++)
             {
@@ -165,12 +167,19 @@ public partial class WorkspaceView : UserControl
             wbMermaidHost.UpdateLayout();
             await Task.Delay(120);
 
+            var devToolsPng = await TryCapturePngViaDevToolsAsync(core);
+            if (devToolsPng is { Length: > 0 })
+            {
+                return devToolsPng;
+            }
+
             using var ms = new MemoryStream();
             await core.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, ms);
             return ms.ToArray();
         }
-        catch
+        catch (Exception ex)
         {
+            LoggingService.LogWarning("WPF Mermaid renderer failed.", ex);
             return null;
         }
         finally
@@ -178,6 +187,27 @@ public partial class WorkspaceView : UserControl
             wbMermaidHost.Width = 10;
             wbMermaidHost.Height = 10;
             _mermaidLock.Release();
+        }
+    }
+
+    private static async Task<byte[]?> TryCapturePngViaDevToolsAsync(CoreWebView2 core)
+    {
+        try
+        {
+            const string options = "{\"format\":\"png\",\"fromSurface\":true}";
+            var json = await core.CallDevToolsProtocolMethodAsync("Page.captureScreenshot", options);
+            using var doc = JsonDocument.Parse(json);
+            if (!doc.RootElement.TryGetProperty("data", out var dataProperty))
+            {
+                return null;
+            }
+
+            var base64 = dataProperty.GetString();
+            return string.IsNullOrWhiteSpace(base64) ? null : Convert.FromBase64String(base64);
+        }
+        catch
+        {
+            return null;
         }
     }
 
@@ -580,4 +610,3 @@ internal enum AiOperationType
     Quiz = 2,
     Answer = 3
 }
-

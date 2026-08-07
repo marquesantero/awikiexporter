@@ -25,36 +25,12 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{Binding HeaderTitle}" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource PrimaryDarkBrush}" />
                     <TextBlock Margin="0,4,0,0" Text="{Binding Status}" Foreground="#5B6C7E" />
                 </StackPanel>
-
-                <Border Grid.Column="1"
-                        Width="300"
-                        Padding="10,9"
-                        Margin="12,0,0,0"
-                        VerticalAlignment="Top"
-                        Background="#E9F1FB"
-                        CornerRadius="7"
-                        BorderBrush="#C9DBF2"
-                        BorderThickness="1"
-                        Visibility="{Binding ShowBusyFeedback, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <StackPanel>
-                        <TextBlock Text="{Binding BusyMessage}"
-                                   Foreground="#1D3E63"
-                                   FontWeight="SemiBold"
-                                   FontSize="12" />
-                        <ProgressBar Margin="0,6,0,0"
-                                     Height="8"
-                                     Foreground="#0F6CBD"
-                                     Background="#DCE5F0"
-                                     IsIndeterminate="True" />
-                    </StackPanel>
-                </Border>
             </Grid>
         </Border>
 
@@ -420,6 +396,40 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <Border Grid.RowSpan="2"
+                Panel.ZIndex="20"
+                Width="560"
+                MaxWidth="560"
+                Padding="18,15"
+                Margin="0,86,0,0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Background="#0B4F7C"
+                CornerRadius="8"
+                BorderBrush="#DFF2FF"
+                BorderThickness="1"
+                Effect="{DynamicResource CardShadowEffect}"
+                IsHitTestVisible="False"
+                Visibility="{Binding ShowBusyFeedback, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="{Binding BusyTitleText}"
+                           Foreground="#BFE7FF"
+                           FontWeight="Bold"
+                           FontSize="12" />
+                <TextBlock Margin="0,3,0,0"
+                           Text="{Binding BusyMessage}"
+                           Foreground="#FFFFFF"
+                           FontWeight="SemiBold"
+                           FontSize="18"
+                           TextWrapping="Wrap" />
+                <ProgressBar Margin="0,12,0,0"
+                             Height="12"
+                             Foreground="#58C4FF"
+                             Background="#0A4268"
+                             IsIndeterminate="True" />
+            </StackPanel>
+        </Border>
 
         <wv2:WebView2 x:Name="wbPrintHost"
                       Width="1"

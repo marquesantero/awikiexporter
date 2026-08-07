@@ -22,7 +22,8 @@ internal sealed class HtmlPipelineBackend
         LoggingService.LogInfo($"WORD_MATH_PIPELINE_STAGE=PREPARE_HTML; hasMath={hasMath}");
 
         var highlightedHtml = await ExportChromiumPipelineService.TryProcessCombinedHtmlAsync(html).ConfigureAwait(false);
-        return MergeHighlightedHtmlWithOriginalMermaidSource(html, highlightedHtml);
+        var mergedHtml = MergeHighlightedHtmlWithOriginalMermaidSource(html, highlightedHtml);
+        return await ExportChromiumPipelineService.TryRenderMermaidAndInlineImagesAsync(mergedHtml).ConfigureAwait(false);
     }
 
     public async Task<string> PrepareForPdfExportAsync(string html)
@@ -82,7 +83,6 @@ internal sealed class HtmlPipelineBackend
         }
     }
 }
-
 
 
 

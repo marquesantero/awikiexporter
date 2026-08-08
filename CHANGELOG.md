@@ -6,6 +6,18 @@ kept out of the product notes.
 
 ## Unreleased
 
+## v1.1.1 - 2026-08-08
+
+### Fixed
+
+- PDF export now uses the WebView2 print layout exclusively, matching the
+  on-screen rendered document more closely and avoiding the broken code-block
+  formatting produced by the previous rendered-PDF path.
+- Word export no longer exposes the legacy fine-tuning option; the default
+  export path now keeps the generated document closer to the rendered Markdown.
+- Release MSIX packages now include the public signing certificate so a new
+  workstation can trust and install the package without a certificate mismatch.
+
 ## v1.1.0 - 2026-06-21
 
 ### Added

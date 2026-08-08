@@ -6,6 +6,20 @@ kept out of the product notes.
 
 ## Unreleased
 
+## v1.1.3 - 2026-08-08
+
+### Added
+
+- GitHub releases now include a classic Windows setup executable
+  (`AWikiExportSetup_<version>.exe`) as the recommended installer for desktop
+  users.
+
+### Fixed
+
+- First-run language selection now follows the Windows display language:
+  Portuguese systems start in Portuguese, and every other system language starts
+  in English unless the user already saved a preference.
+
 ## v1.1.2 - 2026-08-08
 
 ### Fixed

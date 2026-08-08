@@ -45,6 +45,12 @@ A Windows desktop application built with .NET for reading, browsing, rendering, 
 
 ## Quick Start
 
+Download the latest Windows installer from
+[GitHub Releases](https://github.com/marquesantero/awikiexporter/releases):
+`AWikiExportSetup_<version>.exe`.
+
+For development:
+
 ```powershell
 git clone https://github.com/marquesantero/awikiexporter.git
 cd awikiexporter
@@ -91,7 +97,7 @@ ExportAzureWiki.CLI
 | `ExportAzureWiki.Platform/` | Infrastructure, wiki providers, persistence, authentication, authorization, rendering, and export engines. |
 | `ExportAzureWiki.Wpf/` | Primary desktop app, views, view models, dialogs, help files, icons, and rendering assets. |
 | `ExportAzureWiki.CLI/` | Command-line interface for configuration and export workflows. |
-| `AExportWikiSetup/`, `WikiExporterInstall/` | Installer project sources. Generated installer outputs should not be committed. |
+| `build/installer/`, `tools/package/` | Windows installer and package automation. Generated outputs stay under `artifacts/`. |
 
 ## Features
 
@@ -227,7 +233,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution rules.
 - [Configuration reference](docs/operations/CONFIGURATION.md)
 - [Security model](docs/operations/SECURITY.md)
 - [Operations runbook](docs/operations/RUNBOOK.md)
-- [Packaging & release (MSIX)](docs/operations/PACKAGING.md)
+- [Packaging & release](docs/operations/PACKAGING.md)
 
 ## Reports
 
@@ -252,7 +258,7 @@ Planned:
 - Database integration tests with Testcontainers.
 - Migrate the export pipeline off `WebView2.WinForms` to remove the last
   WinForms dependency in Platform.
-- Signed MSIX packaging and release provenance (SLSA).
+- Signed Windows installer release provenance (SLSA).
 - Opt-in telemetry.
 - Continue improving Word/PDF visual fidelity.
 

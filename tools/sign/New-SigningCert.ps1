@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-    Generates a self-signed code-signing certificate for signing the
-    ExportAzureWiki MSIX package, and exports it as .pfx (to sign with)
-    and .cer (to distribute so machines trust the package).
+    Generates a self-signed code-signing certificate for signing
+    ExportAzureWiki Windows packages, and exports it as .pfx (to sign with)
+    and .cer (to distribute so machines trust MSIX packages).
 
 .DESCRIPTION
     For INTERNAL distribution: machines that trust the exported .cer
     (deployed via Group Policy to the Local Machine Trusted People store, or
-    imported manually as administrator) can install the signed MSIX without a SmartScreen
-    or "untrusted publisher" prompt.
+    imported manually as administrator) can install the signed MSIX without an
+    "untrusted publisher" prompt. Self-signed executable installers can still
+    trigger SmartScreen until the project uses a public/managed signing identity.
 
     The certificate Subject printed at the end MUST be used verbatim as
     the MSIX manifest Identity/@Publisher (Build-Msix.ps1 -Publisher).
@@ -65,7 +66,7 @@ $cert = New-SelfSignedCertificate `
     -KeyUsage DigitalSignature `
     -KeyAlgorithm RSA `
     -KeyLength 3072 `
-    -FriendlyName 'ExportAzureWiki MSIX Signing' `
+    -FriendlyName 'ExportAzureWiki Package Signing' `
     -NotAfter (Get-Date).AddYears($ValidYears) `
     -CertStoreLocation 'Cert:\CurrentUser\My' `
     -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3')

@@ -1,9 +1,9 @@
 name: Release
 
-# Builds, packages, signs the MSIX, exports the public signing certificate,
-# then attaches them to a GitHub Release. Release notes are taken from the
-# matching CHANGELOG.md section. Triggered by pushing a vX.Y.Z tag (or manually
-# from a tag ref).
+# Builds, packages, signs the Windows installer and MSIX packages, exports the
+# public signing certificate, then attaches them to a GitHub Release. Release
+# notes are taken from the matching CHANGELOG.md section. Triggered by pushing a
+# vX.Y.Z tag (or manually from a tag ref).
 on:
   push:
     tags:
@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 jobs:
-  msix:
-    name: Build and publish MSIX
+  windows:
+    name: Build and publish Windows packages
     runs-on: windows-2025
     steps:
       - name: Checkout
@@ -25,6 +25,10 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
+
+      - name: Setup Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
 
       - name: Derive version from tag
         id: ver
@@ -58,7 +62,7 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($env:PUBLISHER)) { $missing += 'SIGNING_PUBLISHER' }
 
           if ($missing.Count -gt 0) {
-            Write-Host "::error::Release MSIX packages must be signed. Missing signing configuration: $($missing -join ', ')."
+            Write-Host "::error::Release Windows packages must be signed. Missing signing configuration: $($missing -join ', ')."
             exit 1
           }
 
@@ -96,23 +100,34 @@ jobs:
           ./tools/package/Build-Msix.ps1 @args -SelfContained $true
           ./tools/package/Build-Msix.ps1 @args -SelfContained $false
 
-      - name: Upload MSIX as build artifact
+      - name: Build Windows installer
+        shell: pwsh
+        env:
+          PFX_PASSWORD: ${{ secrets.SIGNING_PFX_PASSWORD }}
+        run: |
+          ./tools/package/Build-Installer.ps1 `
+            -Version '${{ steps.ver.outputs.version }}' `
+            -PfxPath '${{ steps.cert.outputs.pfx }}' `
+            -PfxPassword (ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force)
+
+      - name: Upload Windows packages as build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: msix-${{ steps.ver.outputs.version }}
+          name: windows-packages-${{ steps.ver.outputs.version }}
           path: |
+            artifacts/installer/*.exe
             artifacts/msix/*.msix
             artifacts/msix/*.appinstaller
             artifacts/msix/*.cer
           if-no-files-found: error
           retention-days: 30
 
-      - name: Create GitHub Release and attach MSIX
+      - name: Create GitHub Release and attach packages
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $signingNote = "Signed MSIX. The public signing certificate is attached as ExportAzureWiki-signing.cer; install it on machines that need to trust the package (see docs/operations/PACKAGING.md)."
+          $signingNote = "Signed Windows packages. AWikiExportSetup is the recommended installer. MSIX packages and their public signing certificate are also attached for sideload/internal distribution (see docs/operations/PACKAGING.md)."
           # Pull the human-readable notes from CHANGELOG.md (version section, or
           # Unreleased as a fallback) so the release notes track the changelog.
           $changelog = ./tools/release/Get-ChangelogSection.ps1 -Version '${{ steps.ver.outputs.version }}'
@@ -123,6 +138,9 @@ jobs:
             "$changelog`n`n---`n`n$signingNote"
           }
           Set-Content -LiteralPath $notesPath -Value $body -Encoding utf8
-          $assets = Get-ChildItem artifacts/msix/* -Include *.msix,*.appinstaller,*.cer | ForEach-Object FullName
+          $assets = @(
+            Get-ChildItem artifacts/installer -File -Filter *.exe
+            Get-ChildItem artifacts/msix -File | Where-Object { $_.Extension -in '.msix', '.appinstaller', '.cer' }
+          ) | ForEach-Object FullName
           gh release create '${{ github.ref_name }}' $assets `
             --title '${{ github.ref_name }}' --notes-file $notesPath

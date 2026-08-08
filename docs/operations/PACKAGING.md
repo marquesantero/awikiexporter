@@ -1,9 +1,9 @@
-# Packaging & Release (MSIX, self-signed)
+# Packaging & Release
 
-ExportAzureWiki ships as an **MSIX** package signed with a **self-signed
-code-signing certificate**, for **internal distribution** (machines the
-organization controls). Trust is established by deploying the public
-`.cer` to those machines; no paid certificate authority is involved.
+ExportAzureWiki ships a classic **Windows setup executable** as the recommended
+desktop installer. The release workflow also publishes **MSIX** packages for
+internal/sideload deployments that want MSIX identity and optional
+`.appinstaller` update feeds.
 
 > Why self-signed: Azure Trusted Signing's identity validation is not yet
 > available to organizations in Brazil, and public CA certificates now
@@ -27,6 +27,23 @@ This writes (under `artifacts/signing/`, gitignored):
 It prints the exact **Publisher** subject and the base64 command for CI.
 Keep the Subject stable across releases; changing it forces every machine
 to re-trust the new certificate.
+
+## Build a setup executable locally
+
+Requires **Inno Setup 6**, the **Windows SDK** (`signtool.exe`) and the .NET SDK
+from `global.json`.
+
+```powershell
+pwsh ./tools/package/Build-Installer.ps1 `
+    -PfxPath ./artifacts/signing/signing.pfx `
+    -PfxPassword (Read-Host -AsSecureString -Prompt 'PFX password')
+```
+
+Output:
+
+- `artifacts/installer/AWikiExportSetup_<version>.exe`
+
+Omit `-PfxPath` only for a local smoke build. Release installers must be signed.
 
 ## Build an MSIX locally
 
@@ -76,7 +93,8 @@ deployment which one to push.
 
 Pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`, which builds,
 tests, packages, signs, exports the public `.cer`, and attaches those files
-to a GitHub Release.
+to a GitHub Release. The setup executable is the recommended download; MSIX
+files remain available for managed deployments.
 
 Configure once in the repository settings:
 
@@ -88,8 +106,8 @@ Configure once in the repository settings:
 | Var    | `SIGNING_PUBLISHER_DISPLAY` | friendly name, e.g. `Ti com Café`                        |
 
 If any signing secret is absent, the workflow fails before packaging. A
-GitHub Release must never publish an unsigned MSIX. The tag version must
-match `Directory.Build.props` `<Version>`.
+GitHub Release must never publish unsigned Windows packages. The tag version
+must match `Directory.Build.props` `<Version>`.
 
 ```powershell
 git tag v1.0.0
@@ -141,11 +159,11 @@ Releases are driven by a `vX.Y.Z` tag and the GitHub **Release** workflow:
    git push origin v1.1.0
    ```
 3. The workflow derives the version from the tag, runs the test gate, builds
-   (and signs, if secrets are present) both MSIX flavors, and creates a GitHub
+   and signs the setup executable plus both MSIX flavors, and creates a GitHub
    Release whose notes are taken from the matching `CHANGELOG.md` section
    (`tools/release/Get-ChangelogSection.ps1`; falls back to `Unreleased`).
 
-The package version is the tag; the MSIX revision is the workflow run number.
+The setup version is the tag; the MSIX revision is the workflow run number.
 
 ## Auto-update (`.appinstaller`)
 
@@ -167,8 +185,9 @@ must be reachable from the client and match the hosted file names.
 
 ## Verification status
 
-The scripts and manifest are authored to known-good MSIX patterns, but
-the `MakeAppx`/`signtool` packaging step only runs on Windows with the
-SDK. The first tagged release (or a local run of `Build-Msix.ps1`) is the
-real end-to-end validation. If `signtool` reports a publisher mismatch,
-the `-Publisher` value does not match the certificate Subject.
+The scripts and manifests are authored to known-good Windows packaging
+patterns, but the Inno Setup and `MakeAppx`/`signtool` packaging steps only run
+on Windows with the required tooling. The first tagged release, or a local run
+of `Build-Installer.ps1` / `Build-Msix.ps1`, is the real end-to-end validation.
+If MSIX `signtool` reports a publisher mismatch, the `-Publisher` value does not
+match the certificate Subject.

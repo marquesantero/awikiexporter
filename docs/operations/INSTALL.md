@@ -38,7 +38,26 @@ On first launch the setup wizard creates:
 
 ## Production install (Windows desktop)
 
-### 1. Database setup
+### 1. Trust the MSIX signer
+
+For self-signed internal releases, download both files from the GitHub
+Release:
+
+- `ExportAzureWiki_<version>_selfcontained.msix` or `_fxdependent.msix`
+- `ExportAzureWiki-signing.cer`
+
+Trust the public certificate before installing the MSIX:
+
+```powershell
+pwsh ./tools/sign/Install-MsixCertificate.ps1 `
+    -CertificatePath ./ExportAzureWiki-signing.cer `
+    -MsixPath ./ExportAzureWiki_<version>_selfcontained.msix
+```
+
+For managed machines, deploy the `.cer` via Group Policy or run the same
+script with `-Scope LocalMachine` from an elevated PowerShell session.
+
+### 2. Database setup
 
 Pick an engine and create the database. Schemas are applied
 automatically on first run; no DBA scripts to deliver.
@@ -52,7 +71,7 @@ The application user needs:
 | MySQL      | `CREATE`, `ALTER`, `INDEX`, plus `SELECT`/`INSERT`/`UPDATE`/`DELETE` |
 | SQLite     | Filesystem write to the database file                      |
 
-### 2. TLS configuration
+### 3. TLS configuration
 
 The defaults reject self-signed certs. Make sure the certificate
 the database server presents is rooted in a trusted CA on every
@@ -65,7 +84,7 @@ client machine. If it is **not**, two choices:
 See [`CONFIGURATION.md`](CONFIGURATION.md) for the resulting
 connection-string shape.
 
-### 3. Network egress
+### 4. Network egress
 
 The application reaches:
 
@@ -80,7 +99,7 @@ The application reaches:
 A network proxy that intercepts TLS (corporate MitM) must have its
 root CA installed on the workstation.
 
-### 4. WebView2 runtime
+### 5. WebView2 runtime
 
 WebView2 powers the rendering surface and the export pipeline. The
 **Evergreen** distribution receives security updates from Microsoft.
@@ -88,7 +107,7 @@ For locked-down environments the **fixed-version** runtime can be
 shipped alongside the app; document the version in your change log
 and update it on every Chromium security advisory.
 
-### 5. First-run setup
+### 6. First-run setup
 
 Launch `ExportAzureWiki.Wpf.exe`. The setup wizard collects:
 
@@ -106,7 +125,7 @@ The wizard finalizes the schema and writes the bootstrap config to
 the database. After that, the same admin account is used to register
 additional users, configure OAuth providers, and assign permissions.
 
-### 6. Backup / restore
+### 7. Backup / restore
 
 | Item                                                          | What to back up                              |
 | ------------------------------------------------------------- | -------------------------------------------- |

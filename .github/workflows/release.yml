@@ -1,7 +1,7 @@
 name: Release
 
-# Builds, packages and (when signing secrets are present) signs the MSIX,
-# then attaches it to a GitHub Release. Release notes are taken from the
+# Builds, packages, signs the MSIX, exports the public signing certificate,
+# then attaches them to a GitHub Release. Release notes are taken from the
 # matching CHANGELOG.md section. Triggered by pushing a vX.Y.Z tag (or manually
 # from a tag ref).
 on:
@@ -49,18 +49,24 @@ jobs:
         shell: pwsh
         env:
           PFX_B64: ${{ secrets.SIGNING_PFX_BASE64 }}
+          PFX_PASSWORD: ${{ secrets.SIGNING_PFX_PASSWORD }}
+          PUBLISHER: ${{ secrets.SIGNING_PUBLISHER }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:PFX_B64)) {
-            Write-Host "::warning::SIGNING_PFX_BASE64 not set; producing an UNSIGNED package."
-            "signed=false" | Out-File $env:GITHUB_OUTPUT -Append
-          } else {
-            $dir = Join-Path $env:RUNNER_TEMP 'signing'
-            New-Item -ItemType Directory -Force -Path $dir | Out-Null
-            $pfx = Join-Path $dir 'signing.pfx'
-            [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:PFX_B64))
-            "pfx=$pfx" | Out-File $env:GITHUB_OUTPUT -Append
-            "signed=true" | Out-File $env:GITHUB_OUTPUT -Append
+          $missing = @()
+          if ([string]::IsNullOrWhiteSpace($env:PFX_B64)) { $missing += 'SIGNING_PFX_BASE64' }
+          if ([string]::IsNullOrWhiteSpace($env:PFX_PASSWORD)) { $missing += 'SIGNING_PFX_PASSWORD' }
+          if ([string]::IsNullOrWhiteSpace($env:PUBLISHER)) { $missing += 'SIGNING_PUBLISHER' }
+
+          if ($missing.Count -gt 0) {
+            Write-Host "::error::Release MSIX packages must be signed. Missing signing configuration: $($missing -join ', ')."
+            exit 1
           }
+
+          $dir = Join-Path $env:RUNNER_TEMP 'signing'
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          $pfx = Join-Path $dir 'signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:PFX_B64))
+          "pfx=$pfx" | Out-File $env:GITHUB_OUTPUT -Append
 
       - name: Build MSIX
         shell: pwsh
@@ -70,17 +76,15 @@ jobs:
           PUBLISHER_DISPLAY: ${{ vars.SIGNING_PUBLISHER_DISPLAY }}
           APPINSTALLER_URI: ${{ vars.APPINSTALLER_BASE_URI }}
         run: |
-          $publisher = if ([string]::IsNullOrWhiteSpace($env:PUBLISHER)) { 'CN=ExportAzureWiki Dev' } else { $env:PUBLISHER }
+          $publisher = $env:PUBLISHER
           $display   = if ([string]::IsNullOrWhiteSpace($env:PUBLISHER_DISPLAY)) { 'ExportAzureWiki' } else { $env:PUBLISHER_DISPLAY }
           $args = @{
             Version              = '${{ steps.ver.outputs.version }}'
             Revision             = ${{ github.run_number }}
             Publisher            = $publisher
             PublisherDisplayName = $display
-          }
-          if ('${{ steps.cert.outputs.signed }}' -eq 'true') {
-            $args.PfxPath     = '${{ steps.cert.outputs.pfx }}'
-            $args.PfxPassword = (ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force)
+            PfxPath              = '${{ steps.cert.outputs.pfx }}'
+            PfxPassword          = (ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force)
           }
           # When an internal feed URL is configured, also emit .appinstaller
           # files so installed apps auto-update from that feed.
@@ -99,6 +103,7 @@ jobs:
           path: |
             artifacts/msix/*.msix
             artifacts/msix/*.appinstaller
+            artifacts/msix/*.cer
           if-no-files-found: error
           retention-days: 30
 
@@ -107,11 +112,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $signingNote = if ('${{ steps.cert.outputs.signed }}' -eq 'true') {
-            "Signed MSIX. Install on machines that trust the signing certificate (see docs/operations/PACKAGING.md)."
-          } else {
-            "UNSIGNED MSIX (no signing secrets configured). Not installable until signed."
-          }
+          $signingNote = "Signed MSIX. The public signing certificate is attached as ExportAzureWiki-signing.cer; install it on machines that need to trust the package (see docs/operations/PACKAGING.md)."
           # Pull the human-readable notes from CHANGELOG.md (version section, or
           # Unreleased as a fallback) so the release notes track the changelog.
           $changelog = ./tools/release/Get-ChangelogSection.ps1 -Version '${{ steps.ver.outputs.version }}'
@@ -122,6 +123,6 @@ jobs:
             "$changelog`n`n---`n`n$signingNote"
           }
           Set-Content -LiteralPath $notesPath -Value $body -Encoding utf8
-          $assets = Get-ChildItem artifacts/msix/* -Include *.msix,*.appinstaller | ForEach-Object FullName
+          $assets = Get-ChildItem artifacts/msix/* -Include *.msix,*.appinstaller,*.cer | ForEach-Object FullName
           gh release create '${{ github.ref_name }}' $assets `
             --title '${{ github.ref_name }}' --notes-file $notesPath

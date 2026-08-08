@@ -6,8 +6,8 @@
 
 .DESCRIPTION
     For INTERNAL distribution: machines that trust the exported .cer
-    (deployed via Group Policy to Trusted People + Trusted Root, or
-    imported manually) can install the signed MSIX without a SmartScreen
+    (deployed via Group Policy to the Local Machine Trusted People store, or
+    imported manually as administrator) can install the signed MSIX without a SmartScreen
     or "untrusted publisher" prompt.
 
     The certificate Subject printed at the end MUST be used verbatim as

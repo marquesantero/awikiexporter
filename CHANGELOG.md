@@ -6,6 +6,14 @@ kept out of the product notes.
 
 ## Unreleased
 
+## v1.1.2 - 2026-08-08
+
+### Fixed
+
+- MSIX installation guidance now imports the public signing certificate into
+  the Local Machine Trusted People store, which is the store Windows App
+  Installer uses to verify self-signed package publishers.
+
 ## v1.1.1 - 2026-08-08
 
 ### Fixed

@@ -38,7 +38,17 @@ On first launch the setup wizard creates:
 
 ## Production install (Windows desktop)
 
-### 1. Trust the MSIX signer
+### 1. Install AWikiExport
+
+For normal desktop installation, download and run the setup executable from the
+GitHub Release:
+
+- `AWikiExportSetup_<version>.exe`
+
+The installer creates Start Menu entries, registers the application in Windows
+Apps & Features, and can optionally create a desktop shortcut.
+
+### MSIX alternative
 
 For self-signed internal releases, download both files from the GitHub
 Release:

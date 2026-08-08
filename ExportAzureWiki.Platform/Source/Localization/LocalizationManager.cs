@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -288,7 +289,7 @@ public static partial class LocalizationManager
         (new Regex(@"^Documento PDF exportado com sucesso!?$", RegexOptions.IgnoreCase), _ => "PDF document exported successfully!")
     ];
 
-    public static SupportedLanguage CurrentLanguage { get; private set; } = SupportedLanguage.Portuguese;
+    public static SupportedLanguage CurrentLanguage { get; private set; } = DetermineDefaultLanguage(CultureInfo.CurrentUICulture);
     public static event EventHandler? LanguageChanged;
 
     /// <summary>Test seam: the Portuguese semantic dictionary keys.</summary>
@@ -429,14 +430,19 @@ public static partial class LocalizationManager
             var value = connection.QueryFirstOrDefault<string>(sql, new { Key = LanguageSettingKey });
             if (string.IsNullOrWhiteSpace(value))
             {
-                return SupportedLanguage.Portuguese;
+                return DetermineDefaultLanguage(CultureInfo.CurrentUICulture);
             }
 
             var persisted = JsonSerializer.Deserialize<PersistedLanguage>(value);
-            return persisted?.Language ?? SupportedLanguage.Portuguese;
+            return persisted?.Language ?? DetermineDefaultLanguage(CultureInfo.CurrentUICulture);
         }
-        catch { return SupportedLanguage.Portuguese; }
+        catch { return DetermineDefaultLanguage(CultureInfo.CurrentUICulture); }
     }
+
+    internal static SupportedLanguage DetermineDefaultLanguage(CultureInfo culture)
+        => string.Equals(culture.TwoLetterISOLanguageName, "pt", StringComparison.OrdinalIgnoreCase)
+            ? SupportedLanguage.Portuguese
+            : SupportedLanguage.English;
 
     private static void SaveLanguage(SupportedLanguage language)
     {

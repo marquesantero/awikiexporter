@@ -20,14 +20,12 @@
     <PackageVersion Include="MySqlConnector" Version="2.5.0" />
     <PackageVersion Include="Npgsql" Version="10.0.0" />
 
-    <!-- Document export (Word / PDF / HTML) -->
+    <!-- Document export (Word / HTML) -->
     <PackageVersion Include="DocumentFormat.OpenXml" Version="3.1.0" />
     <PackageVersion Include="DocX" Version="3.0.1" />
     <PackageVersion Include="ExCSS" Version="4.2.6" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.66" />
     <PackageVersion Include="HtmlToOpenXml.dll" Version="3.2.0" />
-    <PackageVersion Include="itext7.bouncy-castle-adapter" Version="8.0.5" />
-    <PackageVersion Include="itext7.pdfhtml" Version="5.0.5" />
     <PackageVersion Include="Markdig" Version="0.37.0" />
     <!-- Rasterize SVG (badges, inline diagrams) and transcode webp to PNG so
          they survive the Word export. Both are managed (no native binaries):
@@ -82,12 +80,11 @@
     <!--
       Transitive pin overrides for known CVEs surfaced by the NuGet
       vulnerability scan (dotnet list package, vulnerable, transitive). These
-      packages are dragged in by legacy clients (TFS, iText, OpenXml, DocX).
+      packages are dragged in by legacy clients (TFS, OpenXml, DocX).
       Bumping them here forces the restore to a non-vulnerable floor without
       touching the direct deps. Remove entries that become redundant once
       direct deps catch up.
     -->
-    <PackageVersion Include="BouncyCastle.Cryptography" Version="2.6.1" />
     <PackageVersion Include="AngleSharp" Version="1.5.0" />
     <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
     <PackageVersion Include="System.Data.SqlClient" Version="4.9.0" />

@@ -87,7 +87,6 @@ public interface IAiProviderProbeService
 public interface IDocumentExportService
 {
     Task ExportToWordAsync(string html, string filePath, bool applyWordFineTune = false, bool refreshImageCache = false);
-    Task ExportToPdfAsync(string html, string filePath);
 }
 
 public sealed class ExportHistoryEntry

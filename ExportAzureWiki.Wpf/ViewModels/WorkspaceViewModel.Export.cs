@@ -321,7 +321,7 @@ public sealed partial class WorkspaceViewModel
                 html: html,
                 successStatusFormat: AppText.S("wpf.export.status.word_success", "Word exported: {0}"),
                 busyText: AppText.S("wpf.workspace.busy.exporting_word", "Rendering content and exporting Word..."),
-                exportOperation: () => _documentExportService.ExportToWordAsync(html, dialog.FileName, ApplyWordFineTune && SelectedScope == ExportScope.CurrentDocument, RefreshCacheBeforeExport));
+                exportOperation: () => _documentExportService.ExportToWordAsync(html, dialog.FileName, applyWordFineTune: false, refreshImageCache: RefreshCacheBeforeExport));
         }
         catch (Exception ex)
         {
@@ -366,10 +366,23 @@ public sealed partial class WorkspaceViewModel
                 outputPath: dialog.FileName,
                 html: html,
                 successStatusFormat: AppText.S("wpf.export.status.pdf_success", "PDF exported: {0}"),
-                busyText: AppText.S("wpf.workspace.busy.exporting_pdf", "Rendering content and exporting PDF..."),
+                busyText: AppText.S("wpf.workspace.busy.printing_pdf", "Printing PDF..."),
                 exportOperation: async () =>
                 {
-                    await _documentExportService.ExportToPdfAsync(html, dialog.FileName);
+                    if (PdfPrintHandlerAsync == null)
+                    {
+                        throw new InvalidOperationException(AppText.S(
+                            "wpf.export.pdf_print_unavailable",
+                            "PDF print layout is unavailable because the print host is not initialized."));
+                    }
+
+                    var printed = await PdfPrintHandlerAsync(html, dialog.FileName);
+                    if (!printed)
+                    {
+                        throw new InvalidOperationException(AppText.S(
+                            "wpf.export.pdf_print_failed",
+                            "PDF print layout export failed."));
+                    }
                 });
         }
         catch (Exception ex)
@@ -479,7 +492,7 @@ public sealed partial class WorkspaceViewModel
                 Success = success,
                 DurationMs = (int)Math.Min(int.MaxValue, stopwatch.ElapsedMilliseconds),
                 ErrorMessage = errorMessage,
-                DetailsJson = $"{{\"includeAdditionalPages\":{IncludeAdditionalPages.ToString().ToLowerInvariant()},\"refreshCache\":{RefreshCacheBeforeExport.ToString().ToLowerInvariant()},\"applyWordFineTune\":{ApplyWordFineTune.ToString().ToLowerInvariant()}}}"
+                DetailsJson = $"{{\"includeAdditionalPages\":{IncludeAdditionalPages.ToString().ToLowerInvariant()},\"refreshCache\":{RefreshCacheBeforeExport.ToString().ToLowerInvariant()},\"pdfExportMode\":\"print\"}}"
             });
         }
     }

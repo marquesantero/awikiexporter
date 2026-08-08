@@ -113,7 +113,6 @@ internal sealed class DesignAppServiceSet : IAppServiceSet
     private sealed class DesignDocumentExportService : IDocumentExportService
     {
         public Task ExportToWordAsync(string html, string filePath, bool applyWordFineTune = false, bool refreshImageCache = false) => Task.CompletedTask;
-        public Task ExportToPdfAsync(string html, string filePath) => Task.CompletedTask;
     }
 
     private sealed class DesignExportHistoryService : IExportHistoryService

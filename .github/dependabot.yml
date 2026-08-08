@@ -40,10 +40,6 @@ updates:
           - "Microsoft.TeamFoundationServer.*"
           - "Microsoft.VisualStudio.Services.*"
           - "Microsoft.Azure.DevOps.*"
-      itext:
-        patterns:
-          - "itext7*"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

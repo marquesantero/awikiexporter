@@ -216,9 +216,24 @@ public sealed class ExportCenterViewModel : ViewModelBase
                 return;
             }
 
-            Status = AppText.S("wpf.workspace.busy.exporting_pdf", "Exporting PDF...");
-            LoggingService.LogInfo($"EXPORT_CENTER_PDF_START: output='{dialog.FileName}'; htmlLength={html.Length}");
-            await _exportService.ExportToPdfAsync(html, dialog.FileName);
+            Status = AppText.S("wpf.workspace.busy.printing_pdf", "Printing PDF...");
+            LoggingService.LogInfo($"EXPORT_CENTER_PDF_START: mode=print; output='{dialog.FileName}'; htmlLength={html.Length}");
+
+            if (_workspaceViewModel.PdfPrintHandlerAsync == null)
+            {
+                throw new InvalidOperationException(AppText.S(
+                    "wpf.export.pdf_print_unavailable",
+                    "PDF print layout is unavailable because the print host is not initialized."));
+            }
+
+            var printed = await _workspaceViewModel.PdfPrintHandlerAsync(html, dialog.FileName);
+            if (!printed)
+            {
+                throw new InvalidOperationException(AppText.S(
+                    "wpf.export.pdf_print_failed",
+                    "PDF print layout export failed."));
+            }
+
             Status = string.Format(
                 AppText.S("wpf.export.status.pdf_success", "PDF exported: {0}"),
                 dialog.FileName);

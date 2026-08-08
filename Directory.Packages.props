@@ -51,7 +51,7 @@
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="10.0.1" />
 
     <!-- Microsoft.Extensions -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
 
     <!-- Logging -->
     <PackageVersion Include="Serilog" Version="4.2.0" />

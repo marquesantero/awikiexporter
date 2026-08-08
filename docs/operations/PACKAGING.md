@@ -38,11 +38,15 @@ pwsh ./tools/package/Build-Msix.ps1 `
     -PfxPassword (Read-Host -AsSecureString -Prompt 'PFX password')
 ```
 
-Output: `artifacts/msix/ExportAzureWiki_<version>_<flavor>.msix`.
+Output:
+
+- `artifacts/msix/ExportAzureWiki_<version>_<flavor>.msix`
+- `artifacts/msix/ExportAzureWiki-signing.cer` when `-PfxPath` is used
 
 - `-Publisher` **must equal the certificate Subject exactly**, or signing
   (and install) fails.
-- Omit `-PfxPath` to produce an unsigned package for a quick smoke build.
+- Omit `-PfxPath` only for a quick local smoke build. Release packages
+  must be signed.
 - Version defaults to `<Version>` in `Directory.Build.props`; bump it
   there for a release.
 
@@ -71,7 +75,8 @@ deployment which one to push.
 ## Release via CI (tag-triggered)
 
 Pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`, which builds,
-tests, packages, signs, and attaches the MSIX to a GitHub Release.
+tests, packages, signs, exports the public `.cer`, and attaches those files
+to a GitHub Release.
 
 Configure once in the repository settings:
 
@@ -82,9 +87,9 @@ Configure once in the repository settings:
 | Secret | `SIGNING_PUBLISHER`         | the exact cert Subject, e.g. `CN=Ti com Café, O=Ti com Café, C=BR` |
 | Var    | `SIGNING_PUBLISHER_DISPLAY` | friendly name, e.g. `Ti com Café`                        |
 
-If the secrets are absent the workflow still runs but produces an
-**unsigned** package (not installable). The tag version must match
-`Directory.Build.props` `<Version>`.
+If any signing secret is absent, the workflow fails before packaging. A
+GitHub Release must never publish an unsigned MSIX. The tag version must
+match `Directory.Build.props` `<Version>`.
 
 ```powershell
 git tag v1.0.0
@@ -94,23 +99,35 @@ git push origin v1.0.0
 ## Deploying trust to client machines (Group Policy)
 
 For the signed MSIX to install without a prompt, each machine must trust
-the certificate. Deploy `signing.cer` via GPO:
+the certificate. Releases attach the public certificate as
+`ExportAzureWiki-signing.cer`; locally it is generated beside the MSIX.
+Deploy that `.cer` via GPO:
 
 1. **Computer Configuration → Policies → Windows Settings → Security
    Settings → Public Key Policies → Trusted People** → import
-   `signing.cer`. (MSIX sideloading checks Trusted People for the signer.)
-2. Self-signed certs are their own root, so also import `signing.cer` into
+   `ExportAzureWiki-signing.cer`. (MSIX sideloading checks Trusted People
+   for the signer.)
+2. Self-signed certs are their own root, so also import the `.cer` into
    **Trusted Root Certification Authorities** so the chain validates.
 3. Ensure sideloading/Developer-unlock is allowed: on managed devices,
    **Allow all trusted apps to install** (enabled by default on Windows 11;
    on older builds set the *Allow Trusted Apps* policy).
 
-Manual install on a single machine (admin PowerShell):
+Manual install on a single-user test machine:
 
 ```powershell
-Import-Certificate -FilePath signing.cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople
-Import-Certificate -FilePath signing.cer -CertStoreLocation Cert:\LocalMachine\Root
-Add-AppxPackage    -Path    ExportAzureWiki_1.0.0.0.msix
+pwsh ./tools/sign/Install-MsixCertificate.ps1 `
+    -CertificatePath ./ExportAzureWiki-signing.cer `
+    -MsixPath ./ExportAzureWiki_1.0.0.0_selfcontained.msix
+```
+
+Manual install for all users / managed machine (admin PowerShell):
+
+```powershell
+pwsh ./tools/sign/Install-MsixCertificate.ps1 `
+    -CertificatePath ./ExportAzureWiki-signing.cer `
+    -Scope LocalMachine `
+    -MsixPath ./ExportAzureWiki_1.0.0.0_selfcontained.msix
 ```
 
 ## Branding (optional)

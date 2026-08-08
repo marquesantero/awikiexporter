@@ -197,8 +197,10 @@ The remediation plan tracks these and they are NOT shipped as
   Testcontainers wiring is planned (Fase 2.2). Unit-level coverage of
   the security-critical code paths is 107 tests today; DB-level
   coverage is tested locally only.
-- **Code-signing**: production releases should be Authenticode-signed.
-  Not yet wired into the release pipeline.
+- **External distribution trust**: release MSIX packages are signed, but a
+  self-signed certificate still requires the public `.cer` to be trusted on
+  target machines. Public internet distribution should move to a CA-backed
+  or managed code-signing certificate.
 
 ## Cryptographic primitives reference
 

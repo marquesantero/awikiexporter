@@ -28,6 +28,8 @@
 
 .PARAMETER PfxPath / -PfxPassword
     Code-signing certificate. When omitted, the package is left unsigned.
+    When present, the public .cer is exported beside the .msix so target
+    machines can trust the MSIX signer.
 
 .PARAMETER OutputDirectory
     Where the .msix is written. Default: ./artifacts/msix (gitignored).
@@ -154,13 +156,27 @@ if ($LASTEXITCODE -ne 0) { throw "MakeAppx failed." }
 if ($PfxPath) {
     if (-not (Test-Path $PfxPath)) { throw "PFX not found: $PfxPath" }
     if (-not $PfxPassword) { $PfxPassword = Read-Host -AsSecureString -Prompt 'PFX password' }
-    $plainPwd = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($PfxPassword))
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($PfxPassword)
+    try {
+        $plainPwd = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
 
-    Write-Host "Signing $msixName..." -ForegroundColor Cyan
-    & $signTool sign /fd SHA256 /a /f $PfxPath /p $plainPwd $msixPath
-    if ($LASTEXITCODE -ne 0) { throw "signtool failed (does Publisher match the cert Subject?)." }
-    Write-Host "Signed." -ForegroundColor Green
+        Write-Host "Signing $msixName..." -ForegroundColor Cyan
+        & $signTool sign /fd SHA256 /a /f $PfxPath /p $plainPwd $msixPath
+        if ($LASTEXITCODE -ne 0) { throw "signtool failed (does Publisher match the cert Subject?)." }
+        Write-Host "Signed." -ForegroundColor Green
+
+        $certificate = [Security.Cryptography.X509Certificates.X509Certificate2]::new($PfxPath, $plainPwd)
+        $cerPath = Join-Path $OutputDirectory 'ExportAzureWiki-signing.cer'
+        [IO.File]::WriteAllBytes(
+            $cerPath,
+            $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+        Write-Host "Public signing certificate ready: $cerPath" -ForegroundColor Green
+    }
+    finally {
+        if ($bstr -ne [IntPtr]::Zero) {
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+        }
+    }
 }
 else {
     Write-Warning "No -PfxPath given: package is UNSIGNED and cannot be installed until signed."

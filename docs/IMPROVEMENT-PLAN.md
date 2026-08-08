@@ -12,9 +12,9 @@ Ordem de execução recomendada:
 ## M1 — Riscos críticos (privacidade + estabilidade)
 
 ### M1.1 Eliminar dependência de `mermaid.ink` (render local) — L — risco alto
-- **Problema:** no export Word/PDF o código do diagrama é enviado a `mermaid.ink`
-  (`ExportService.Preprocessing.cs` → `TryBuildMermaidInkUrl`, usado no Word e em
-  `NormalizeMermaidForPdf`). Vazamento de conteúdo corporativo + falha offline.
+- **Problema:** no export Word o código do diagrama era enviado a `mermaid.ink`
+  (`ExportService.Preprocessing.cs` → `TryBuildMermaidInkUrl`). Vazamento de
+  conteúdo corporativo + falha offline.
 - **Escopo:** renderizar Mermaid localmente via WebView2 offscreen (já embarcamos
   `style/vendor/mermaid/mermaid.min.js`): carregar o diagrama, exportar o SVG
   resultante e rasterizar para PNG (reaproveitar `RasterImageConverter.SvgToPng`).

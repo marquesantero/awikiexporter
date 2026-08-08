@@ -350,24 +350,26 @@
                                             BorderBrush="#DCE5F0"
                                             BorderThickness="1"
                                             CornerRadius="7">
-                                        <StackPanel>
+                                        <WrapPanel VerticalAlignment="Center">
                                             <RadioButton Content="{Binding CurrentDocumentText}"
+                                                         GroupName="WorkspaceExportScope"
                                                          IsChecked="{Binding IsCurrentScope}"
-                                                         Margin="0,0,0,6" />
+                                                         VerticalAlignment="Center"
+                                                         Margin="0,0,12,0" />
                                             <RadioButton Content="{Binding AllLoadedPagesText}"
+                                                         GroupName="WorkspaceExportScope"
                                                          IsChecked="{Binding IsAllLoadedPagesScope}"
-                                                         Margin="0,0,0,6" />
+                                                         VerticalAlignment="Center"
+                                                         Margin="0,0,12,0" />
                                             <CheckBox Content="{Binding IncludeAiPagesText}"
                                                       IsChecked="{Binding IncludeAdditionalPages}"
-                                                      Margin="0,0,0,6" />
-                                            <CheckBox Content="{Binding ApplyWordFineTuneText}"
-                                                      IsChecked="{Binding ApplyWordFineTune}"
-                                                      IsEnabled="{Binding CanApplyWordFineTune}"
-                                                      Visibility="{Binding IsWordFineTuneVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0" />
                                             <CheckBox Content="{Binding OfflineExportText}"
                                                       IsChecked="{Binding OfflineExport}"
-                                                      Margin="0,0,0,6" />
-                                        </StackPanel>
+                                                      VerticalAlignment="Center"
+                                                      Margin="0" />
+                                        </WrapPanel>
                                     </Border>
 
                                     <StackPanel Grid.Column="2">

@@ -228,7 +228,7 @@ Ações:
 2. verificar scripts/mapeamento de nomes,
 3. confirmar banco correto na configuração ativa.
 
-## 12.2 Erros em exportação PDF (iText/SVG)
+## 12.2 Erros em exportação PDF (print/SVG)
 
 Causa comum:
 

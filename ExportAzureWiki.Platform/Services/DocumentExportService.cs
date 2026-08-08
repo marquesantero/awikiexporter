@@ -21,13 +21,7 @@ public sealed class DocumentExportService : IDocumentExportService
     {
         return _backend.ExportToWordAsync(html, filePath, applyWordFineTune, refreshImageCache);
     }
-
-    public Task ExportToPdfAsync(string html, string filePath)
-    {
-        return _backend.ExportToPdfAsync(html, filePath);
-    }
 }
-
 
 
 

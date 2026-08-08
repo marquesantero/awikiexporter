@@ -10,7 +10,7 @@ namespace ExportAzureWiki;
 /// and HTML-to-PDF path (SafeCaptureHtmlAsPngSlicesAsync, SafePrintHtmlToPdfAsync,
 /// SafeRenderMermaidToImageHtmlAsync, SafeProcessCombinedHtmlAsync). That path
 /// belonged to the legacy WinForms UI and was replaced by the WPF shell's own
-/// WebView2 (WPF) print host plus the iText/OpenXML pipeline in ExportService.
+/// WebView2 (WPF) print host plus the OpenXML pipeline in ExportService.
 /// Those methods were dead code and were removed in Fase 3.1b to drop the
 /// Microsoft.Web.WebView2.WinForms and System.Drawing dependencies, which let
 /// Platform turn off UseWindowsForms entirely.

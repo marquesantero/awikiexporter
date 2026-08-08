@@ -30,8 +30,6 @@
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="HtmlToOpenXml.dll" />
     <PackageReference Include="LibGit2Sharp" />
-    <PackageReference Include="itext7.bouncy-castle-adapter" />
-    <PackageReference Include="itext7.pdfhtml" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="Svg" />
     <PackageReference Include="SixLabors.ImageSharp" />
@@ -55,14 +53,13 @@
 
   <!--
     Direct references that exist only to override CVE-vulnerable transitive
-    versions dragged in by legacy TFS/iText/OpenXml/DocX packages. Versions
+    versions dragged in by legacy TFS/OpenXml/DocX packages. Versions
     are pinned in Directory.Packages.props. Remove an entry once the direct
     dependency that originally pulled it has bumped its own transitive floor
     past the vulnerable version.
   -->
   <ItemGroup>
     <PackageReference Include="AngleSharp" />
-    <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
     <PackageReference Include="System.Data.SqlClient" />
     <PackageReference Include="System.Drawing.Common" />

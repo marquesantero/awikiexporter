@@ -56,21 +56,7 @@ internal sealed class ExportBackend : IExportBackend
             }
         });
     }
-
-    public Task ExportToPdfAsync(string html, string filePath)
-    {
-        // Same rationale as Word: iText's HtmlConverter.ConvertToPdf inside
-        // ExportToPdfAsync is synchronous CPU work. (The WPF shell's primary
-        // PDF path prints through its own WebView2 control and never reaches
-        // this method; this is the headless/iText fallback the CLI also uses.)
-        return Task.Run(async () =>
-        {
-            var preparedHtml = await _pipeline.PrepareForPdfExportAsync(html).ConfigureAwait(false);
-            await _exportService.ExportToPdfAsync(preparedHtml, filePath).ConfigureAwait(false);
-        });
-    }
 }
-
 
 
 

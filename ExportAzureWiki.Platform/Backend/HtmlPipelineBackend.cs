@@ -26,18 +26,6 @@ internal sealed class HtmlPipelineBackend
         return await ExportChromiumPipelineService.TryRenderMermaidAndInlineImagesAsync(mergedHtml).ConfigureAwait(false);
     }
 
-    public async Task<string> PrepareForPdfExportAsync(string html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-        {
-            return html;
-        }
-
-        var processed = await ExportChromiumPipelineService.TryProcessCombinedHtmlAsync(html).ConfigureAwait(false);
-        processed = await ExportChromiumPipelineService.TryRenderMermaidAndInlineImagesAsync(processed).ConfigureAwait(false);
-        return processed;
-    }
-
     private static string MergeHighlightedHtmlWithOriginalMermaidSource(string originalHtml, string highlightedHtml)
     {
         if (string.IsNullOrWhiteSpace(highlightedHtml))
@@ -83,6 +71,5 @@ internal sealed class HtmlPipelineBackend
         }
     }
 }
-
 
 

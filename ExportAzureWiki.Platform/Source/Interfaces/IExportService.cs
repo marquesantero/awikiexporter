@@ -6,7 +6,6 @@ namespace ExportAzureWiki.Interfaces;
 public interface IExportService
 {
     void ExportToWord(string htmlContent, string filePath, string? wordTemplatePath = null, bool applyWordFineTune = false);
-    Task ExportToPdfAsync(string htmlContent, string filePath);
 }
 
 public interface IAzureDevOpsService : IDisposable

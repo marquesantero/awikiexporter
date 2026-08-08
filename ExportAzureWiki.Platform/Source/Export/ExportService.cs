@@ -13,14 +13,6 @@ using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 using System.Text;
 using System.Net;
 using ExportAzureWiki.Interfaces;
-using iText.Html2pdf;
-using iText.IO.Image;
-using iText.Kernel.Pdf;
-using ITextDocument = iText.Layout.Document;
-using ITextAreaBreak = iText.Layout.Element.AreaBreak;
-using ITextImage = iText.Layout.Element.Image;
-using ITextAreaBreakType = iText.Layout.Properties.AreaBreakType;
-using ITextHorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
 using HtmlToOpenXmlConverter = HtmlToOpenXml.HtmlConverter;
 using System.Net.Http;
 using ExportAzureWiki.Localization;
@@ -674,6 +666,5 @@ namespace ExportAzureWiki
 
     }
 }
-
 
 

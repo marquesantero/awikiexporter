@@ -96,7 +96,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-## Deploying trust to client machines (Group Policy)
+## Deploying trust to client machines
 
 For the signed MSIX to install without a prompt, each machine must trust
 the certificate. Releases attach the public certificate as
@@ -107,26 +107,18 @@ Deploy that `.cer` via GPO:
    Settings → Public Key Policies → Trusted People** → import
    `ExportAzureWiki-signing.cer`. (MSIX sideloading checks Trusted People
    for the signer.)
-2. Self-signed certs are their own root, so also import the `.cer` into
-   **Trusted Root Certification Authorities** so the chain validates.
-3. Ensure sideloading/Developer-unlock is allowed: on managed devices,
+2. Ensure sideloading/Developer-unlock is allowed: on managed devices,
    **Allow all trusted apps to install** (enabled by default on Windows 11;
    on older builds set the *Allow Trusted Apps* policy).
 
-Manual install on a single-user test machine:
+Do not import the certificate into the Current User store. App Installer checks
+the Local Computer certificate stores when verifying package identity.
+
+Manual install on a test machine, from an elevated PowerShell session:
 
 ```powershell
 pwsh ./tools/sign/Install-MsixCertificate.ps1 `
     -CertificatePath ./ExportAzureWiki-signing.cer `
-    -MsixPath ./ExportAzureWiki_1.0.0.0_selfcontained.msix
-```
-
-Manual install for all users / managed machine (admin PowerShell):
-
-```powershell
-pwsh ./tools/sign/Install-MsixCertificate.ps1 `
-    -CertificatePath ./ExportAzureWiki-signing.cer `
-    -Scope LocalMachine `
     -MsixPath ./ExportAzureWiki_1.0.0.0_selfcontained.msix
 ```
 

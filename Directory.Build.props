@@ -17,7 +17,7 @@
       it onto the 4-part Package/Identity version. Bump here for a release;
       the git tag (vX.Y.Z) should match.
     -->
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Product>ExportAzureWiki</Product>
     <Company>Ti com Café</Company>
 

@@ -46,7 +46,8 @@ Release:
 - `ExportAzureWiki_<version>_selfcontained.msix` or `_fxdependent.msix`
 - `ExportAzureWiki-signing.cer`
 
-Trust the public certificate before installing the MSIX:
+Trust the public certificate before installing the MSIX from an elevated
+PowerShell session:
 
 ```powershell
 pwsh ./tools/sign/Install-MsixCertificate.ps1 `
@@ -54,8 +55,10 @@ pwsh ./tools/sign/Install-MsixCertificate.ps1 `
     -MsixPath ./ExportAzureWiki_<version>_selfcontained.msix
 ```
 
-For managed machines, deploy the `.cer` via Group Policy or run the same
-script with `-Scope LocalMachine` from an elevated PowerShell session.
+For managed machines, deploy the `.cer` to **Local Computer → Trusted
+People** via Group Policy or Intune. Do not import it into the Current User
+certificate store; App Installer does not use that store when verifying MSIX
+package identity.
 
 ### 2. Database setup
 

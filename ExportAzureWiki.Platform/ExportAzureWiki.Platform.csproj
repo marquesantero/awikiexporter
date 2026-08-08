@@ -65,6 +65,7 @@
     <PackageReference Include="System.Drawing.Common" />
     <PackageReference Include="System.IO.Packaging" />
     <PackageReference Include="System.Net.Http" />
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <!--

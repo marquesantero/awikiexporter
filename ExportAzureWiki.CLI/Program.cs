@@ -48,7 +48,7 @@ internal static class Program
         var formatOption = new Option<string>("--format", "Export format")
         {
             IsRequired = true
-        }.FromAmong("docx", "pdf", "html");
+        }.FromAmong("docx", "html");
 
         var outputOption = new Option<string>("--output", "Output file path")
         {
@@ -246,9 +246,6 @@ internal static class Program
             {
                 case "docx":
                     await services.DocumentExport.ExportToWordAsync(combinedHtml, output);
-                    break;
-                case "pdf":
-                    await services.DocumentExport.ExportToPdfAsync(combinedHtml, output);
                     break;
                 case "html":
                     await File.WriteAllTextAsync(output, combinedHtml);

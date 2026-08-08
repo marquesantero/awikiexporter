@@ -16,7 +16,7 @@
     <!-- Data access -->
     <PackageVersion Include="Dapper" Version="2.1.66" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.3" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageVersion Include="MySqlConnector" Version="2.5.0" />
     <PackageVersion Include="Npgsql" Version="10.0.0" />
 
